@@ -183,6 +183,8 @@ public class PatternMenuActivity extends AppCompatActivity {
             for(int i = 0; i < 3; i++)
             {
                 DBItem item =  myDbHelper.getRandomItem();
+                if(item == null)
+                    continue;
                 Button b = new Button(getApplicationContext());
                 b.setText(Html.fromHtml("<br><b><big>" + item.name + "</big></b>" +  "<br />" +
                         "<small>" + item.comment + "</small>" + "<br />"));

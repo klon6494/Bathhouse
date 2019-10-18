@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -46,6 +47,14 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         getValues();
         fillWindow();
+    }
+
+    public void onBackPressed() {
+        if (m_currentId == 0) {
+            return;
+        } else {
+            super.onBackPressed();
+        }
     }
 
     protected void getValues()
@@ -154,18 +163,21 @@ public class PatternMenuActivity extends AppCompatActivity {
             {
                 tv.setText(Html.fromHtml(m_currentItem.content));
             }
+            tv.setTextSize(20);
             tv.setId(USER_ID+999);
             tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-
+            tv.setGravity(View.TEXT_ALIGNMENT_CENTER);
             ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(tv);
 
 
             //мутим случайные кнопки из категорий
             TextView interest = new TextView(this);
-            interest.setText("Возможно вам будет интересно: ");
+            interest.setText("\n Возможно вам будет интересно: ");
+            interest.setTextSize(20);
+            interest.setTypeface(interest.getTypeface(), Typeface.BOLD);
             interest.setId(USER_ID+1000);
             interest.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-
+            interest.setGravity(View.TEXT_ALIGNMENT_CENTER);
             ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(interest);
 
             for(int i = 0; i < 3; i++)

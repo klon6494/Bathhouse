@@ -55,9 +55,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void createDataBase() throws IOException{
         boolean dbExist = checkDataBase();
 
-        if(dbExist){
-            //ничего не делать - база уже есть
-        }else{
+//        if(dbExist){
+//            //ничего не делать - база уже есть
+//        }else{
             //вызывая этот метод создаем пустую базу, позже она будет перезаписана
             this.getReadableDatabase();
 
@@ -67,7 +67,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 throw new Error("Error copying database");
             }
        }
-    }
+//    }
 
     /**
      * Проверяет, существует ли уже эта база, чтобы не копировать каждый раз при запуске приложения

@@ -28,17 +28,6 @@
                 android:layout_weight="0"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/textName"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="0dp"
-                    android:text=""
-                    android:textAlignment="center"
-                    android:textSize="30sp"
-                    android:textStyle="bold"
-                    android:visibility="visible" />
-
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="match_parent"

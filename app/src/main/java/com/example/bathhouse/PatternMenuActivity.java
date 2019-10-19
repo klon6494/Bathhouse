@@ -1,5 +1,6 @@
 package com.example.bathhouse;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -10,6 +11,7 @@ import android.database.SQLException;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -106,9 +108,14 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void fillWindow()
     {
         if(m_currentItem.id < 1)
-            ((TextView)findViewById(R.id.textName)).setText("Название прилки");
-        else
-            ((TextView)findViewById(R.id.textName)).setText(m_currentItem.name);
+            setTitle("Название прилки");
+        else {
+            setTitle(m_currentItem.name);
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+
 
         //Рисуем картинку сверху
         if(m_currentItem.image != null && !m_currentItem.image.isEmpty())
@@ -204,6 +211,19 @@ public class PatternMenuActivity extends AppCompatActivity {
                 });
                 ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
             }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

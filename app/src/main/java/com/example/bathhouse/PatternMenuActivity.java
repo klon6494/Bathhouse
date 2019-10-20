@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Html;
@@ -39,6 +41,10 @@ public class PatternMenuActivity extends AppCompatActivity {
     boolean IS_MENU = true;
     final int USER_ID = 6000;
     DataBaseHelper myDbHelper = new DataBaseHelper(this);
+    int COLOR_BUTTON = 0xFF5F9EA0;
+    int COLOR_BACKGROUND = 0xFFADD8E6;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,18 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         m_currentId = bundle.getInt("parentId", -1);
+
+        setContentView(R.layout.activity_pattern_menu);
+
+        // Now get a handle to any View contained
+        // within the main layout you are using
+        View someView = findViewById(R.id.imageView);
+
+        // Find the root view
+        View root = someView.getRootView();
+
+        // Set the color
+        root.setBackgroundColor(COLOR_BACKGROUND);
 
         getValues();
         fillWindow();
@@ -157,6 +175,8 @@ public class PatternMenuActivity extends AppCompatActivity {
                     }
                 });
 
+                b.getBackground().setColorFilter(COLOR_BUTTON, PorterDuff.Mode.MULTIPLY);
+
                 ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
                 countID++;
             }
@@ -212,6 +232,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+                b.getBackground().setColorFilter(COLOR_BUTTON, PorterDuff.Mode.MULTIPLY);
                 ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
             }
         }

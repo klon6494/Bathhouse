@@ -68,6 +68,7 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         getValues();
         fillWindow();
+
     }
 
     public void onBackPressed() {
@@ -128,7 +129,6 @@ public class PatternMenuActivity extends AppCompatActivity {
     {
         if(m_currentItem.id < 1) {
             setTitle("Название прилки");
-            findViewById(R.id.home_button);
         }
         else {
             setTitle(m_currentItem.name);
@@ -242,6 +242,11 @@ public class PatternMenuActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
+        if(m_currentId < 1)
+        {
+            MenuItem item = menu.findItem(R.id.home_button);
+            item.setVisible(false);
+        }
         return true;
     }
 

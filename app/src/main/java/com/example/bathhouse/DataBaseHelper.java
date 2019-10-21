@@ -157,7 +157,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     {
         int numRows = (int)DatabaseUtils.queryNumEntries(myDataBase, "main");
         Random r = new Random();
-        int rId = r.nextInt(numRows);
+        int rId = r.nextInt(numRows-1)+1;
         Cursor query =  myDataBase.query(TABLE_NAME, null, ID + "=" + String.valueOf(rId), null, null, null, ID);
         DBItem item = new DBItem();
         if (query.moveToFirst()) {

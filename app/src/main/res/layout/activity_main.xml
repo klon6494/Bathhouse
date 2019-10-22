@@ -7,4 +7,17 @@
     tools:context=".MainActivity">
 
 
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="155dp"
+        android:layout_marginTop="315dp"
+        android:layout_marginEnd="155dp"
+        android:layout_marginBottom="315dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ico" />
 </androidx.constraintlayout.widget.ConstraintLayout>

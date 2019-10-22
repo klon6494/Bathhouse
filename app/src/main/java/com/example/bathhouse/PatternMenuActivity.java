@@ -1,8 +1,11 @@
 package com.example.bathhouse;
 
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,6 +13,7 @@ import android.database.SQLException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
@@ -41,10 +45,6 @@ public class PatternMenuActivity extends AppCompatActivity {
     boolean IS_MENU = true;
     final int USER_ID = 6000;
     DataBaseHelper myDbHelper = new DataBaseHelper(this);
-    int COLOR_BUTTON = 0xFF5F9EA0;
-    int COLOR_BACKGROUND = 0xFFADD8E6;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +56,9 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_pattern_menu);
 
-        // Now get a handle to any View contained
-        // within the main layout you are using
         View someView = findViewById(R.id.imageView);
-
-        // Find the root view
         View root = someView.getRootView();
-
-        // Set the color
-        root.setBackgroundColor(COLOR_BACKGROUND);
+        root.setBackgroundColor(getColor(R.color.colorBackground));
 
         getValues();
         fillWindow();
@@ -128,15 +122,13 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void fillWindow()
     {
         if(m_currentItem.id < 1) {
-            setTitle("Название прилки");
+            setTitle(R.string.app_name);
         }
         else {
             setTitle(m_currentItem.name);
             ActionBar actionBar = getSupportActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-
 
         //Рисуем картинку сверху
         if(m_currentItem.image != null && !m_currentItem.image.isEmpty())
@@ -158,24 +150,39 @@ public class PatternMenuActivity extends AppCompatActivity {
 
             for (DBItem item : m_itemsList) {
                 Button b = new Button(getApplicationContext());
-                b.setText(Html.fromHtml("<br><b><big>" + item.name + "</big></b>" +  "<br />" +
-                        "<small>" + item.comment + "</small>" + "<br />"));
-                b.setLayoutParams(
-                        new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT)
-                );
+                b.setText(Html.fromHtml("<b><big>" + item.name + "</big></b>" +  "<br />" +
+                        "<small>" + item.comment + "</small>"));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(10,10,10,10);
+                b.setLayoutParams(params);
                 b.setId(USER_ID + item.id);
+                final Activity tmp = this;
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Bundle bundle = null;
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
+                        bundle = options.toBundle();
+
                         Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
                         intent.putExtra("parentId", v.getId() - USER_ID);
-                        startActivity(intent);
+                        startActivity(intent,bundle);
                     }
                 });
 
-                b.getBackground().setColorFilter(COLOR_BUTTON, PorterDuff.Mode.MULTIPLY);
+                GradientDrawable shape =  new GradientDrawable();
+                shape.setCornerRadius(50);
+
+                if (countID % 2 == 0) {
+                    shape.setColor(getColor(R.color.colorButton));
+                } else {
+                    shape.setColor(getColor(R.color.colorButton1));
+                }
+                b.setPadding(50,50,50,50);
+                b.setBackground(shape);
+
 
                 ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
                 countID++;
@@ -216,23 +223,38 @@ public class PatternMenuActivity extends AppCompatActivity {
                 if(item == null)
                     continue;
                 Button b = new Button(getApplicationContext());
-                b.setText(Html.fromHtml("<br><b><big>" + item.name + "</big></b>" +  "<br />" +
-                        "<small>" + item.comment + "</small>" + "<br />"));
-                b.setLayoutParams(
-                        new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT)
-                );
+                b.setText(Html.fromHtml("<b><big>" + item.name + "</big></b>" +  "<br />" +
+                        "<small>" + item.comment + "</small>"));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(10,10,10,10);
+                b.setLayoutParams(params);
                 b.setId(USER_ID + item.id);
+                final Activity tmp = this;
                 b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Bundle bundle = null;
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
+                        bundle = options.toBundle();
+
                         Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
                         intent.putExtra("parentId", v.getId() - USER_ID);
-                        startActivity(intent);
+                        startActivity(intent, bundle);
                     }
                 });
-                b.getBackground().setColorFilter(COLOR_BUTTON, PorterDuff.Mode.MULTIPLY);
+
+
+                //b.getBackground().setColorFilter(COLOR_BUTTON, PorterDuff.Mode.MULTIPLY);
+                GradientDrawable shape =  new GradientDrawable();
+                shape.setCornerRadius(50);
+
+
+                shape.setColor(getColor(R.color.colorButton));
+
+                b.setPadding(50,50,50,50);
+                b.setBackground(shape);
                 ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
             }
         }
@@ -256,12 +278,16 @@ public class PatternMenuActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.home_button:
+                Bundle bundle = null;
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this);
+                bundle = options.toBundle();
+
                 Intent intent = new Intent(this, PatternMenuActivity.class);
                 intent.putExtra("parentId", 0);
-                startActivity(intent);
+                startActivity(intent, bundle);
                 return true;
             case android.R.id.home:
-                this.finish();
+                onBackPressed();
                 return true;
 
             default:

@@ -3,6 +3,7 @@ package com.example.bathhouse;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -16,10 +17,12 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -121,6 +124,13 @@ public class PatternMenuActivity extends AppCompatActivity {
 
     protected void fillWindow()
     {
+        final int sdk = android.os.Build.VERSION.SDK_INT;
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            ((LinearLayout)findViewById(R.id.linearLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
+        } else {
+            ((LinearLayout)findViewById(R.id.linearLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
+        }
+
         if(m_currentItem.id < 1) {
             setTitle(R.string.app_name);
         }
@@ -140,7 +150,11 @@ public class PatternMenuActivity extends AppCompatActivity {
         }
         else if(m_currentId == 0)
         {
-            ((ImageView)findViewById(R.id.imageView)).setImageResource(R.drawable.main);
+            ImageView iv = (ImageView)findViewById(R.id.imageView);
+
+            iv.setImageResource(R.drawable.main);
+            iv.setMaxHeight(500);
+            getSupportActionBar().hide();
         }
 
         if(IS_MENU) //Два видо окон: меню и статьи
@@ -156,6 +170,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.setMargins(10,10,10,10);
+
                 b.setLayoutParams(params);
                 b.setId(USER_ID + item.id);
                 final Activity tmp = this;
@@ -180,6 +195,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                 } else {
                     shape.setColor(getColor(R.color.colorButton1));
                 }
+                shape.setAlpha(170);
                 b.setPadding(50,50,50,50);
                 b.setBackground(shape);
 
@@ -202,8 +218,14 @@ public class PatternMenuActivity extends AppCompatActivity {
             }
             tv.setTextSize(20);
             tv.setId(USER_ID+999);
-            tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
             tv.setGravity(View.TEXT_ALIGNMENT_CENTER);
+            tv.setBackgroundResource(R.drawable.text_background);
+
+            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            llp.setMargins(10, 20, 10, 10); // llp.setMargins(left, top, right, bottom);
+            tv.setLayoutParams(llp);
+            tv.setTextColor(Color.BLACK);
             ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(tv);
 
 
@@ -211,6 +233,7 @@ public class PatternMenuActivity extends AppCompatActivity {
             TextView interest = new TextView(this);
             interest.setText("\n Возможно вам будет интересно: ");
             interest.setTextSize(20);
+            interest.setTextColor(Color.BLACK);
             interest.setTypeface(interest.getTypeface(), Typeface.BOLD);
             interest.setId(USER_ID+1000);
             interest.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -254,6 +277,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                 shape.setColor(getColor(R.color.colorButton));
 
                 b.setPadding(50,50,50,50);
+                shape.setAlpha(170);
                 b.setBackground(shape);
                 ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
             }

@@ -65,7 +65,44 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         getValues();
         fillWindow();
+    }
 
+    protected Button generateButton(DBItem item)
+    {
+        Button b = new Button(getApplicationContext());
+        b.setText(Html.fromHtml("<b><big>" + item.name + "</big></b>" +  "<br />" +
+                "<small>" + item.comment + "</small>"));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(10,10,10,10);
+
+        b.setLayoutParams(params);
+        b.setId(USER_ID + item.id);
+        final Activity tmp = this;
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = null;
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
+                bundle = options.toBundle();
+
+                Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
+                intent.putExtra("parentId", v.getId() - USER_ID);
+                startActivity(intent,bundle);
+            }
+        });
+
+        GradientDrawable shape =  new GradientDrawable();
+        shape.setCornerRadius(50);
+
+        shape.setColor(getColor(R.color.colorButton));
+
+        shape.setAlpha(170);
+        b.setPadding(40,40,40,40);
+        b.setBackground(shape);
+        b.setTextColor(Color.BLACK);
+        return b;
     }
 
     public void onBackPressed() {
@@ -122,25 +159,8 @@ public class PatternMenuActivity extends AppCompatActivity {
         IS_MENU = myDbHelper.isItMenu(m_currentId);
     }
 
-    protected void fillWindow()
+    protected void printImage()
     {
-        final int sdk = android.os.Build.VERSION.SDK_INT;
-        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            ((LinearLayout)findViewById(R.id.linearLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
-        } else {
-            ((LinearLayout)findViewById(R.id.linearLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
-        }
-
-        if(m_currentItem.id < 1) {
-            setTitle(R.string.app_name);
-        }
-        else {
-            setTitle(m_currentItem.name);
-            ActionBar actionBar = getSupportActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
-        //Рисуем картинку сверху
         if(m_currentItem.image != null && !m_currentItem.image.isEmpty())
         {
             ImageView imageView = ((ImageView)findViewById(R.id.imageView));
@@ -156,131 +176,105 @@ public class PatternMenuActivity extends AppCompatActivity {
             iv.setMaxHeight(500);
             getSupportActionBar().hide();
         }
+    }
 
-        if(IS_MENU) //Два видо окон: меню и статьи
-        {
-            //Создаем кнопки
-            int countID = 0;
-
-            for (DBItem item : m_itemsList) {
-                Button b = new Button(getApplicationContext());
-                b.setText(Html.fromHtml("<b><big>" + item.name + "</big></b>" +  "<br />" +
-                        "<small>" + item.comment + "</small>"));
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(10,10,10,10);
-
-                b.setLayoutParams(params);
-                b.setId(USER_ID + item.id);
-                final Activity tmp = this;
-                b.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Bundle bundle = null;
-                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
-                        bundle = options.toBundle();
-
-                        Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
-                        intent.putExtra("parentId", v.getId() - USER_ID);
-                        startActivity(intent,bundle);
-                    }
-                });
-
-                GradientDrawable shape =  new GradientDrawable();
-                shape.setCornerRadius(50);
-
-                if (countID % 2 == 0) {
-                    shape.setColor(getColor(R.color.colorButton));
-                } else {
-                    shape.setColor(getColor(R.color.colorButton1));
-                }
-                shape.setAlpha(170);
-                b.setPadding(50,50,50,50);
-                b.setBackground(shape);
-
-
-                ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
-                countID++;
-            }
+    protected void setBackGroundAndTitle() {
+        final int sdk = android.os.Build.VERSION.SDK_INT;
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            ((LinearLayout)findViewById(R.id.linearLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
+        } else {
+            ((LinearLayout)findViewById(R.id.linearLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
         }
-        else //если статья
+
+        if(m_currentItem.id < 1) {
+            setTitle(R.string.app_name);
+        }
+        else {
+            setTitle(m_currentItem.name);
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    protected void printButtons()
+    {
+        for (DBItem item : m_itemsList) {
+
+            Button b = generateButton(item);
+            ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
+        }
+    }
+
+    protected void printArticle()
+    {
+        // заполняем текстом
+        TextView tv = new TextView(this);
+        if(m_currentItem.content == null || m_currentItem.content.isEmpty())
         {
-            // заполняем текстом
-            TextView tv = new TextView(this);
-            if(m_currentItem.content == null || m_currentItem.content.isEmpty())
-            {
-                tv.setText("Тут пока нет статьи");
-            }
-            else
-            {
-                tv.setText(Html.fromHtml(m_currentItem.content));
-            }
-            tv.setTextSize(20);
-            tv.setId(USER_ID+999);
-            tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-            tv.setGravity(View.TEXT_ALIGNMENT_CENTER);
-            tv.setBackgroundResource(R.drawable.text_background);
+            tv.setText("Тут пока нет статьи");
+        }
+        else
+        {
+            tv.setText(Html.fromHtml(m_currentItem.content));
+        }
+        tv.setTextSize(20);
+        tv.setId(USER_ID+999);
+        tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        tv.setGravity(View.TEXT_ALIGNMENT_CENTER);
+        tv.setBackgroundResource(R.drawable.text_background);
 
-            LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            llp.setMargins(10, 20, 10, 10); // llp.setMargins(left, top, right, bottom);
-            tv.setLayoutParams(llp);
-            tv.setTextColor(Color.BLACK);
-            ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(tv);
+        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        llp.setMargins(10, 20, 10, 10); // llp.setMargins(left, top, right, bottom);
+        tv.setLayoutParams(llp);
+        tv.setTextColor(Color.BLACK);
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(tv);
+    }
 
+    protected void printRandomButtons()
+    {
+        //мутим случайные кнопки из категорий
+        TextView interest = new TextView(this);
+        interest.setText("Возможно вам будет интересно: ");
+        interest.setTextSize(18);
+        interest.setTextColor(Color.BLACK);
+        interest.setTypeface(interest.getTypeface(), Typeface.BOLD);
+        interest.setId(USER_ID+1000);
+        interest.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        interest.setGravity(View.TEXT_ALIGNMENT_CENTER);
+        interest.setBackgroundColor(getColor(R.color.colorHeader));
+        LinearLayout.LayoutParams paramsi = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        paramsi.setMargins(0,20,0,20);
+        interest.setPadding(10,0,0,0);
+        interest.setLayoutParams(paramsi);
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(interest);
 
-            //мутим случайные кнопки из категорий
-            TextView interest = new TextView(this);
-            interest.setText("\n Возможно вам будет интересно: ");
-            interest.setTextSize(20);
-            interest.setTextColor(Color.BLACK);
-            interest.setTypeface(interest.getTypeface(), Typeface.BOLD);
-            interest.setId(USER_ID+1000);
-            interest.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            interest.setGravity(View.TEXT_ALIGNMENT_CENTER);
-            ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(interest);
+        for(int i = 0; i < 3; i++)
+        {
+            DBItem item =  myDbHelper.getRandomItem();
+            if(item == null)
+                continue;
 
-            for(int i = 0; i < 3; i++)
-            {
-                DBItem item =  myDbHelper.getRandomItem();
-                if(item == null)
-                    continue;
-                Button b = new Button(getApplicationContext());
-                b.setText(Html.fromHtml("<b><big>" + item.name + "</big></b>" +  "<br />" +
-                        "<small>" + item.comment + "</small>"));
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(10,10,10,10);
-                b.setLayoutParams(params);
-                b.setId(USER_ID + item.id);
-                final Activity tmp = this;
-                b.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Bundle bundle = null;
-                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
-                        bundle = options.toBundle();
-
-                        Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
-                        intent.putExtra("parentId", v.getId() - USER_ID);
-                        startActivity(intent, bundle);
-                    }
-                });
+            Button b = generateButton(item);
+            ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
+        }
+    }
 
 
-                //b.getBackground().setColorFilter(COLOR_BUTTON, PorterDuff.Mode.MULTIPLY);
-                GradientDrawable shape =  new GradientDrawable();
-                shape.setCornerRadius(50);
+    protected void fillWindow()
+    {
+        setBackGroundAndTitle();
+        printImage();
 
-
-                shape.setColor(getColor(R.color.colorButton));
-
-                b.setPadding(50,50,50,50);
-                shape.setAlpha(170);
-                b.setBackground(shape);
-                ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
-            }
+        if(IS_MENU)
+        {
+            printButtons();
+        }
+        else
+        {
+            printArticle();
+            printRandomButtons();
         }
     }
 

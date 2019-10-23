@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
@@ -156,8 +157,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     DBItem getRandomItem()
     {
         int numRows = (int)DatabaseUtils.queryNumEntries(myDataBase, "main");
+        ArrayList<Integer> ids = new ArrayList<>();
+        String[] idString = {"_id"};
+        Cursor query1 =  myDataBase.query(TABLE_NAME, idString, null, null, null, null, ID);
+        if (query1.moveToFirst()) {
+            while (!query1.isAfterLast()) {
+                ids.add(query1.getInt(PatternMenuActivity.cols.ID.ordinal()));
+                query1.moveToNext();
+            }
+        }
+
         Random r = new Random();
-        int rId = r.nextInt(numRows-1)+1;
+        int rId = ids.get(r.nextInt(numRows));
         Cursor query =  myDataBase.query(TABLE_NAME, null, ID + "=" + String.valueOf(rId), null, null, null, ID);
         DBItem item = new DBItem();
         if (query.moveToFirst()) {
@@ -168,9 +179,11 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 item.parentId = query.getInt(PatternMenuActivity.cols.PARENT_ID.ordinal());
                 item.image = query.getString(PatternMenuActivity.cols.IMAGE.ordinal());
                 item.content = query.getString(PatternMenuActivity.cols.CONTENT.ordinal());
+                query.close();
                 return item;
             }
         }
+        query.close();
         return null;
     }
 

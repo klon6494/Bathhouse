@@ -217,7 +217,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         {
             tv.setText(Html.fromHtml(m_currentItem.content));
         }
-        tv.setTextSize(20);
+        tv.setTextSize(15);
         tv.setId(USER_ID+999);
         tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
         tv.setGravity(View.TEXT_ALIGNMENT_CENTER);

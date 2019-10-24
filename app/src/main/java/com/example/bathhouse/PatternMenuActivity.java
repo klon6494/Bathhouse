@@ -41,19 +41,18 @@ public class PatternMenuActivity extends AppCompatActivity {
         IMAGE,
         CONTENT
     }
-
     int m_currentId = -1;
     ArrayList<DBItem> m_itemsList = new ArrayList<>();
     DBItem m_currentItem = new DBItem();
     boolean IS_MENU = true;
     final int USER_ID = 6000;
-    DataBaseHelper myDbHelper = new DataBaseHelper(this);
+    DataBaseHelper myDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pattern_menu);
-
+        myDbHelper = new DataBaseHelper(this);
         Bundle bundle = getIntent().getExtras();
         m_currentId = bundle.getInt("parentId", -1);
 
@@ -102,6 +101,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setPadding(40,40,40,40);
         b.setBackground(shape);
         b.setTextColor(Color.BLACK);
+        b.setAllCaps(false);
         return b;
     }
 
@@ -116,7 +116,7 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void getValues()
     {
         try {
-            myDbHelper.createDataBase();
+            myDbHelper.updateDataBase();
         } catch (IOException ioe) {
             throw new Error("Unable to create database");
         }
@@ -220,7 +220,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         tv.setTextSize(15);
         tv.setId(USER_ID+999);
         tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        tv.setGravity(View.TEXT_ALIGNMENT_CENTER);
+        tv.setGravity(Gravity.CENTER);
         tv.setBackgroundResource(R.drawable.text_background);
 
         LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);

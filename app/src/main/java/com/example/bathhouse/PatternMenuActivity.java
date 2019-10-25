@@ -47,12 +47,14 @@ public class PatternMenuActivity extends AppCompatActivity {
     boolean IS_MENU = true;
     final int USER_ID = 6000;
     DataBaseHelper myDbHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pattern_menu);
-        myDbHelper = new DataBaseHelper(this);
+
+        MyApplication myApp = (MyApplication)this.getApplication();
+        myDbHelper = myApp.db();
+
         Bundle bundle = getIntent().getExtras();
         m_currentId = bundle.getInt("parentId", -1);
 
@@ -115,18 +117,6 @@ public class PatternMenuActivity extends AppCompatActivity {
 
     protected void getValues()
     {
-        try {
-            myDbHelper.updateDataBase();
-        } catch (IOException ioe) {
-            throw new Error("Unable to create database");
-        }
-
-        try {
-            myDbHelper.openDataBase();
-        }catch(SQLException sqle){
-            throw sqle;
-        }
-
         Cursor data = myDbHelper.getDBValues(m_currentId);
         if (data.moveToFirst()) {
             while ( !data.isAfterLast() ) {

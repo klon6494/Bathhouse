@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">bathhouse</string>
+    <string name="app_name">Бани и сауны: руководство</string>
+    <string name="home_button">На главную страницу</string>
 </resources>

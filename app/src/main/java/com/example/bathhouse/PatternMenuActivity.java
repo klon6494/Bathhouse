@@ -240,11 +240,14 @@ public class PatternMenuActivity extends AppCompatActivity {
         interest.setLayoutParams(paramsi);
         ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(interest);
 
+        ArrayList<Integer> used = new ArrayList<>();
         for(int i = 0; i < 3; i++)
         {
             DBItem item =  myDbHelper.getRandomItem();
-            if(item == null)
-                continue;
+            while (item == null || used.contains(item.id))
+                item =  myDbHelper.getRandomItem();
+
+            used.add(item.id);
 
             Button b = generateButton(item);
             ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);

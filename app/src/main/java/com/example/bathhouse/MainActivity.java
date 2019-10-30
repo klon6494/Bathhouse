@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
                 startApp();
             }
         }, 1000);
-
     }
 
     protected void startApp(){
@@ -53,11 +52,19 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, PatternMenuActivity.class);
         intent.putExtra("parentId", 0);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (bundle == null) {
             startActivity(intent);
         } else {
             startActivity(intent, bundle);
         }
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                finishAffinity();
+            }
+        }, 1000);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

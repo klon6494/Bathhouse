@@ -16,6 +16,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.view.Gravity;
 import android.view.Menu;
@@ -81,6 +82,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setLayoutParams(params);
         b.setId(USER_ID + item.id);
         final Activity tmp = this;
+        final MyApplication myApp = (MyApplication)this.getApplication();
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,7 +92,14 @@ public class PatternMenuActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
                 intent.putExtra("parentId", v.getId() - USER_ID);
+                myApp.pushStack(m_currentId);
                 startActivity(intent,bundle);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        finish();
+                    }
+                }, 1000);
             }
         });
 
@@ -108,10 +117,29 @@ public class PatternMenuActivity extends AppCompatActivity {
     }
 
     public void onBackPressed() {
-        if (m_currentId == 0) {
+       /* if (m_currentId == 0)
             return;
-        } else {
+        else*/
+       //super.onBackPressed();
+        MyApplication myApp = (MyApplication)this.getApplication();
+        int id = myApp.popStack();
+        if(id < 0)
             super.onBackPressed();
+        else
+        {
+            Bundle bundle = null;
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this);
+            bundle = options.toBundle();
+
+            Intent intent = new Intent(this, PatternMenuActivity.class);
+            intent.putExtra("parentId", id);
+            startActivity(intent, bundle);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    finish();
+                }
+            }, 1000);
         }
     }
 
@@ -295,7 +323,15 @@ public class PatternMenuActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(this, PatternMenuActivity.class);
                 intent.putExtra("parentId", 0);
+                MyApplication myApp = (MyApplication)this.getApplication();
+                myApp.pushStack(m_currentId);
                 startActivity(intent, bundle);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        finish();
+                    }
+                }, 1000);
                 return true;
             case android.R.id.home:
                 onBackPressed();

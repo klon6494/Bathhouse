@@ -31,13 +31,23 @@
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="0"
                     android:adjustViewBounds="true" />
             </LinearLayout>
 
 
         </ScrollView>
+
+        <com.google.android.gms.ads.doubleclick.PublisherAdView
+            android:id="@+id/publisherAdView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            app:adSize="BANNER"
+            app:adUnitId="/6499/example/banner">
+        </com.google.android.gms.ads.doubleclick.PublisherAdView>
 
     </LinearLayout>
 

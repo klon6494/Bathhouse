@@ -26,6 +26,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
+
 import java.util.ArrayList;
 
 public class PatternMenuActivity extends AppCompatActivity {
@@ -61,10 +66,17 @@ public class PatternMenuActivity extends AppCompatActivity {
         View root = someView.getRootView();
         root.setBackgroundColor(getColor(R.color.colorBackground));
 
+        generateAds();
         getValues();
         fillWindow();
     }
 
+    protected void generateAds()
+    {
+        PublisherAdView mPublisherAdView = findViewById(R.id.publisherAdView);
+        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
+        mPublisherAdView.loadAd(adRequest);
+    }
     protected Button generateButton(DBItem item)
     {
         Button b = new Button(getApplicationContext());

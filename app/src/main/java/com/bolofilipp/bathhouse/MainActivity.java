@@ -10,6 +10,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -25,6 +29,13 @@ public class MainActivity extends AppCompatActivity {
         View someView = findViewById(R.id.logoImage);
         View root = someView.getRootView();
         root.setBackgroundColor(getColor(R.color.colorBackground));
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {

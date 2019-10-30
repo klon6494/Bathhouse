@@ -12,6 +12,10 @@
         android:theme="@style/AppTheme"
         android:name="com.bolofilipp.bathhouse.MyApplication">
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3564080458767960~3600198422"/>
+
         <activity android:name="com.bolofilipp.bathhouse.PatternMenuActivity"
             android:screenOrientation="portrait"/>
         <activity android:name="com.bolofilipp.bathhouse.MainActivity"

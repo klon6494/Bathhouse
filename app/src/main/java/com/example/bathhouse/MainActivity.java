@@ -31,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().hide(); // hide the title bar
 
+        MyApplication myApp=(MyApplication)this.getApplication();
+        myApp.initializeDb(this);
+
         View someView = findViewById(R.id.logoImage);
         View root = someView.getRootView();
         root.setBackgroundColor(getColor(R.color.colorBackground));

@@ -74,7 +74,7 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void generateAds()
     {
         PublisherAdView mPublisherAdView = findViewById(R.id.publisherAdView);
-        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
+        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
         mPublisherAdView.loadAd(adRequest);
     }
     protected Button generateButton(DBItem item)
@@ -243,7 +243,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         {
             tv.setText(Html.fromHtml(m_currentItem.content));
         }
-        tv.setTextSize(17);
+        tv.setTextSize(15);
         tv.setId(USER_ID+999);
         tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
         tv.setGravity(Gravity.CENTER);

@@ -66,6 +66,8 @@ public class PatternMenuActivity extends AppCompatActivity {
         View root = someView.getRootView();
         root.setBackgroundColor(getColor(R.color.colorBackground));
 
+        AppRater.app_launched(this, myApp.stackSize());
+
         generateAds();
         getValues();
         fillWindow();

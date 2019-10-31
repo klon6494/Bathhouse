@@ -12,6 +12,11 @@ public class MyApplication extends Application {
     private DataBaseHelper m_db;
     private Stack<Integer> backStack = new Stack<>();
 
+    public Integer stackSize()
+    {
+        return backStack.size();
+    }
+
     public void pushStack(int id)
     {
         backStack.push(id);

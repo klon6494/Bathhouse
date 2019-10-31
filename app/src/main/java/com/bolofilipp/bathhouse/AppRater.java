@@ -1,6 +1,7 @@
 package com.bolofilipp.bathhouse;
 
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,9 +15,9 @@ public class AppRater {
     private final static String APP_TITLE = "Бани и сауны: руководство";// App Name
     private final static String APP_PNAME = "com.bolofilipp.bathhouse";// Package Name
 
-    private final static int DAYS_UNTIL_PROMPT = 0;//Min number of days
-    private final static int LAUNCHES_UNTIL_PROMPT = 0;//Min number of launches
-    private final static int MIN_STACK_SIZE = 3;//Min number of launches
+    private final static int DAYS_UNTIL_PROMPT = 3;//Min number of days
+    private final static int LAUNCHES_UNTIL_PROMPT = 3;//Min number of launches
+    private static int MIN_STACK_SIZE = 3;//Min number of click cathegories
 
     public static void app_launched(Context mContext, int stackSize) {
         SharedPreferences prefs = mContext.getSharedPreferences("apprater", 0);
@@ -82,6 +83,7 @@ public class AppRater {
         b2.setText("Позже");
         b2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                MIN_STACK_SIZE += 10;
                 dialog.dismiss();
             }
         });
@@ -91,7 +93,26 @@ public class AppRater {
         b1.setText("Оценить");
         b1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + APP_PNAME)));
+
+                Uri uri = Uri.parse("market://details?id=" + mContext.getPackageName());
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                // To count with Play market backstack, After pressing back button,
+                // to taken back to our application, we need to add following flags to intent.
+                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                try {
+                    mContext.startActivity(goToMarket);
+                } catch (ActivityNotFoundException e) {
+                    mContext.startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=" + mContext.getPackageName())));
+                }
+
+                if (editor != null) {
+                    editor.putBoolean("dontshowagain", true);
+                    editor.commit();
+                }
+
                 dialog.dismiss();
             }
         });

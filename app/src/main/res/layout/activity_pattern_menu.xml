@@ -36,20 +36,27 @@
                     android:adjustViewBounds="true"
                     android:layout_marginBottom="3dp"/>
 
-                <com.google.android.gms.ads.doubleclick.PublisherAdView
-                    android:id="@+id/publisherAdView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    app:adSize="BANNER"
-                    app:adUnitId="ca-app-pub-3564080458767960/8494745538">
-                </com.google.android.gms.ads.doubleclick.PublisherAdView>
-
             </LinearLayout>
 
-
         </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/adsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:orientation="vertical"
+            android:background="@color/colorHeader">
+
+            <com.google.android.gms.ads.doubleclick.PublisherAdView
+                android:id="@+id/publisherAdView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                app:adSize="BANNER"
+                app:adUnitId="ca-app-pub-3564080458767960/8494745538"></com.google.android.gms.ads.doubleclick.PublisherAdView>
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -82,7 +82,7 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected Button generateButton(DBItem item)
     {
         Button b = new Button(getApplicationContext());
-        
+
         if(item.comment != null && !item.comment.isEmpty())
         b.setText(Html.fromHtml("<b><big>" + item.name + "</big></b>" +  "<br />" +
                 "<small>" + item.comment + "</small>"));

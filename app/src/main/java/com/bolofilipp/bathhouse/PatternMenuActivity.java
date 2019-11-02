@@ -49,6 +49,8 @@ public class PatternMenuActivity extends AppCompatActivity {
     boolean IS_MENU = true;
     final int USER_ID = 6000;
     DataBaseHelper myDbHelper;
+    final int ABOUT_ID = 114;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +73,44 @@ public class PatternMenuActivity extends AppCompatActivity {
         generateAds();
         getValues();
         fillWindow();
+    }
+
+    public void addListenerOnPicture() {
+
+        ImageView image = (ImageView) findViewById(R.id.imageView);
+
+        image.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                onPictureClicked();
+            }
+
+        });
+
+    }
+
+    protected void onPictureClicked()
+    {
+        final Activity tmp = this;
+        final MyApplication myApp = (MyApplication)this.getApplication();
+        if(m_currentId == 0)
+        {
+            Bundle bundle = null;
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
+            bundle = options.toBundle();
+
+            Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
+            intent.putExtra("parentId", ABOUT_ID);
+            myApp.pushStack(m_currentId);
+            startActivity(intent,bundle);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    finish();
+                }
+            }, 1000);
+        }
     }
 
     protected void generateAds()
@@ -201,13 +241,12 @@ public class PatternMenuActivity extends AppCompatActivity {
             int id = context.getResources().getIdentifier(m_currentItem.image, "drawable", context.getPackageName());
             imageView.setImageResource(id);
         }
-        else if(m_currentId == 0)
+        else if(m_currentId == 0 || m_currentId == ABOUT_ID)
         {
             ImageView iv = (ImageView)findViewById(R.id.imageView);
 
             iv.setImageResource(R.drawable.main);
             iv.setMaxHeight(500);
-            getSupportActionBar().hide();
         }
     }
 
@@ -267,7 +306,7 @@ public class PatternMenuActivity extends AppCompatActivity {
     {
         //мутим случайные кнопки из категорий
         TextView interest = new TextView(this);
-        interest.setText("Возможно вам будет интересно: ");
+        interest.setText("Возможно, вам понравится: ");
         interest.setTextSize(18);
         interest.setTextColor(Color.BLACK);
         interest.setTypeface(interest.getTypeface(), Typeface.BOLD);
@@ -302,6 +341,11 @@ public class PatternMenuActivity extends AppCompatActivity {
     {
         setBackGroundAndTitle();
         printImage();
+        if(m_currentId == 0)
+        {
+            addListenerOnPicture();
+            getSupportActionBar().hide();
+        }
 
         if(IS_MENU)
         {
@@ -310,7 +354,8 @@ public class PatternMenuActivity extends AppCompatActivity {
         else
         {
             printArticle();
-            printRandomButtons();
+            if(m_currentId != ABOUT_ID)
+                printRandomButtons();
         }
     }
 

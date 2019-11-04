@@ -6,12 +6,14 @@ import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -111,6 +113,25 @@ public class PatternMenuActivity extends AppCompatActivity {
                 }
             }, 1000);
         }
+
+        if(m_currentId == ABOUT_ID)
+        {
+            Bundle bundle = null;
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
+            bundle = options.toBundle();
+
+            Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
+            intent.putExtra("parentId", 0);
+            myApp.pushStack(m_currentId);
+            startActivity(intent,bundle);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    finish();
+                }
+            }, 1000);
+        }
+
     }
 
     protected void generateAds()
@@ -302,6 +323,54 @@ public class PatternMenuActivity extends AppCompatActivity {
         ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(tv);
     }
 
+    protected void printRateButton()
+    {
+        Button b = new Button(getApplicationContext());
+
+        b.setText(Html.fromHtml("<b><big>Оценить приложение</big></b>"));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(10,10,10,10);
+
+        b.setLayoutParams(params);
+        b.setId(USER_ID);
+        final Activity tmp = this;
+        final MyApplication myApp = (MyApplication)this.getApplication();
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("market://details?id=" + getPackageName());
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                // To count with Play market backstack, After pressing back button,
+                // to taken back to our application, we need to add following flags to intent.
+                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                try {
+                    startActivity(goToMarket);
+                } catch (ActivityNotFoundException e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=" + getPackageName())));
+                }
+            }
+        });
+
+        GradientDrawable shape =  new GradientDrawable();
+        shape.setCornerRadius(50);
+
+        shape.setColor(getColor(R.color.colorButton));
+
+        shape.setAlpha(170);
+        b.setPadding(40,40,40,40);
+        b.setBackground(shape);
+        b.setTextColor(Color.BLACK);
+        b.setAllCaps(false);
+
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
+    }
+
     protected void printRandomButtons()
     {
         //мутим случайные кнопки из категорий
@@ -341,10 +410,11 @@ public class PatternMenuActivity extends AppCompatActivity {
     {
         setBackGroundAndTitle();
         printImage();
-        if(m_currentId == 0)
+        if(m_currentId == 0 || m_currentId == ABOUT_ID)
         {
             addListenerOnPicture();
-            getSupportActionBar().hide();
+            if(m_currentId == 0)
+                getSupportActionBar().hide();
         }
 
         if(IS_MENU)
@@ -356,6 +426,8 @@ public class PatternMenuActivity extends AppCompatActivity {
             printArticle();
             if(m_currentId != ABOUT_ID)
                 printRandomButtons();
+            else
+                printRateButton();
         }
     }
 

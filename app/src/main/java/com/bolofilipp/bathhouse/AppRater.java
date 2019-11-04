@@ -1,23 +1,31 @@
 package com.bolofilipp.bathhouse;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.fragment.app.DialogFragment;
 
 public class AppRater {
     private final static String APP_TITLE = "Бани и сауны: руководство";// App Name
     private final static String APP_PNAME = "com.bolofilipp.bathhouse";// Package Name
 
-    private final static int DAYS_UNTIL_PROMPT = 3;//Min number of days
-    private final static int LAUNCHES_UNTIL_PROMPT = 3;//Min number of launches
-    private static int MIN_STACK_SIZE = 3;//Min number of click cathegories
+    private final static int DAYS_UNTIL_PROMPT = 0;//Min number of days
+    private final static int LAUNCHES_UNTIL_PROMPT = 0;//Min number of launches
+    private static int MIN_STACK_SIZE = 0;//Min number of click cathegories
 
     public static void app_launched(Context mContext, int stackSize) {
         SharedPreferences prefs = mContext.getSharedPreferences("apprater", 0);
@@ -49,51 +57,10 @@ public class AppRater {
     }
 
     public static void showRateDialog(final Context mContext, final SharedPreferences.Editor editor) {
-        final Dialog dialog = new Dialog(mContext);
-        dialog.setTitle("Оцените - " + APP_TITLE);
-
-        LinearLayout ll = new LinearLayout(mContext);
-        ll.setOrientation(LinearLayout.VERTICAL);
-
-        TextView tv = new TextView(mContext);
-        tv.setText(R.string.goToStore);
-        tv.setWidth(700);
-        tv.setPadding(4, 0, 4, 10);
-        tv.setTextSize(20);
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        ll.addView(tv);
-
-        LinearLayout llh = new LinearLayout(mContext);
-        llh.setOrientation(LinearLayout.HORIZONTAL);
-
-        Button b3 = new Button(mContext);
-        b3.setText("Нет");
-        b3.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (editor != null) {
-                    editor.putBoolean("dontshowagain", true);
-                    editor.commit();
-                }
-                dialog.dismiss();
-            }
-        });
-        llh.addView(b3);
-
-        Button b2 = new Button(mContext);
-        b2.setText("Позже");
-        b2.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                MIN_STACK_SIZE += 10;
-                dialog.dismiss();
-            }
-        });
-        llh.addView(b2);
-
-        Button b1 = new Button(mContext);
-        b1.setText("Оценить");
-        b1.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.AlertDialogCustom);
+// Add the buttons
+        builder.setPositiveButton("  Оценить  ", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
                 Uri uri = Uri.parse("market://details?id=" + mContext.getPackageName());
                 Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
                 // To count with Play market backstack, After pressing back button,
@@ -116,13 +83,79 @@ public class AppRater {
                 dialog.dismiss();
             }
         });
-        llh.addView(b1);
+        builder.setNeutralButton("Позже", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                MIN_STACK_SIZE += 10;
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (editor != null) {
+                    editor.putBoolean("dontshowagain", true);
+                    editor.commit();
+                }
+                dialog.dismiss();
+            }
+        });
+// Set other dialog properties
+        TextView textView = new TextView(mContext);
+        textView.setTextColor(Color.BLACK);
+        textView.setTextSize(22);
+        textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        textView.setPadding(10,10,10,10);
+        textView.setText(R.string.goToStore);
+        builder.setCustomTitle(textView);
+// Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(final DialogInterface dialog) {
+                Button negativeButton = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
+                Button positiveButton = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+                Button neutralButton = ((AlertDialog)dialog).getButton(DialogInterface.BUTTON_NEUTRAL);
+                // this not working because multiplying white background (e.g. Holo Light) has no effect
+                negativeButton.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
+                positiveButton.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
+                neutralButton.getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);
 
+                negativeButton.setBackgroundColor(Color.WHITE);
+                positiveButton.setBackgroundColor(Color.WHITE);
+                neutralButton.setBackgroundColor(Color.WHITE);
 
-        ll.addView(llh);
+                GradientDrawable shape =  new GradientDrawable();
+                shape.setCornerRadius(30);
+                shape.setColor(mContext.getColor(R.color.colorButton));
+                shape.setAlpha(150);
 
+                LinearLayout.LayoutParams paramsi = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                paramsi.setMargins(5,0,5,0);
 
-        dialog.setContentView(ll);
+                neutralButton.setLayoutParams(paramsi);
+                neutralButton.setPadding(0,0,0,0);
+                neutralButton.setBackground(shape);
+                neutralButton.setTextColor(Color.BLACK);
+
+                negativeButton.setLayoutParams(paramsi);
+                negativeButton.setPadding(0,0,0,0);
+                negativeButton.setBackground(shape);
+                negativeButton.setTextColor(Color.BLACK);
+
+                positiveButton.setLayoutParams(paramsi);
+                positiveButton.setPadding(0,0,0,0);
+                positiveButton.setBackground(shape);
+                positiveButton.setTextColor(Color.BLACK);
+
+                /*negativeButton.invalidate();
+                positiveButton.invalidate();
+                neutralButton.invalidate();*/
+            }
+        });
+
         dialog.show();
     }
 }

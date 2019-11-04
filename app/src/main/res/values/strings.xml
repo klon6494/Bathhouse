@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Бани и сауны: руководство</string>
     <string name="home_button">На главную страницу</string>
-    <string name="goToStore">Вам нравится? Пожалуйста, поставьте оценку на Google Play, это поможет улучшить приложение.</string>
+    <string name="goToStore">Вам нравится? \n Пожалуйста, поставьте оценку на Google Play, это поможет улучшить приложение.</string>
 </resources>

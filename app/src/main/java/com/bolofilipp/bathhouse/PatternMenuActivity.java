@@ -317,7 +317,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         tv.setBackgroundResource(R.drawable.text_background);
 
         LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        llp.setMargins(10, 20, 10, 10); // llp.setMargins(left, top, right, bottom);
+        llp.setMargins(10, 10, 10, 10); // llp.setMargins(left, top, right, bottom);
         tv.setLayoutParams(llp);
         tv.setTextColor(Color.BLACK);
         ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(tv);

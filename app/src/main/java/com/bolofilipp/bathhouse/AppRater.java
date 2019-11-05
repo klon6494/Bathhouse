@@ -23,9 +23,9 @@ public class AppRater {
     private final static String APP_TITLE = "Бани и сауны: руководство";// App Name
     private final static String APP_PNAME = "com.bolofilipp.bathhouse";// Package Name
 
-    private final static int DAYS_UNTIL_PROMPT = 0;//Min number of days
-    private final static int LAUNCHES_UNTIL_PROMPT = 0;//Min number of launches
-    private static int MIN_STACK_SIZE = 0;//Min number of click cathegories
+    private final static int DAYS_UNTIL_PROMPT = 3;//Min number of days
+    private final static int LAUNCHES_UNTIL_PROMPT = 3;//Min number of launches
+    private static int MIN_STACK_SIZE = 3;//Min number of click cathegories
 
     public static void app_launched(Context mContext, int stackSize) {
         SharedPreferences prefs = mContext.getSharedPreferences("apprater", 0);
@@ -150,9 +150,9 @@ public class AppRater {
                 positiveButton.setBackground(shape);
                 positiveButton.setTextColor(Color.BLACK);
 
-                /*negativeButton.invalidate();
+                negativeButton.invalidate();
                 positiveButton.invalidate();
-                neutralButton.invalidate();*/
+                neutralButton.invalidate();
             }
         });
 

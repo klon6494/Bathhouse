@@ -52,13 +52,14 @@ public class PatternMenuActivity extends AppCompatActivity {
     final int USER_ID = 6000;
     DataBaseHelper myDbHelper;
     final int ABOUT_ID = 114;
+    MyApplication myApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pattern_menu);
 
-        MyApplication myApp = (MyApplication)this.getApplication();
+        myApp = (MyApplication)this.getApplication();
         myDbHelper = myApp.db();
 
         Bundle bundle = getIntent().getExtras();
@@ -197,7 +198,6 @@ public class PatternMenuActivity extends AppCompatActivity {
             return;
         else*/
        //super.onBackPressed();
-        MyApplication myApp = (MyApplication)this.getApplication();
         int id = myApp.popStack();
         if(id < 0)
             super.onBackPressed();
@@ -221,36 +221,9 @@ public class PatternMenuActivity extends AppCompatActivity {
 
     protected void getValues()
     {
-        Cursor data = myDbHelper.getDBValues(m_currentId);
-        if (data.moveToFirst()) {
-            while ( !data.isAfterLast() ) {
-                DBItem item = new DBItem();
-                item.id = data.getInt(cols.ID.ordinal());
-                item.name = data.getString(cols.NAME.ordinal());
-                item.comment = data.getString(cols.COMMENT.ordinal());
-                item.parentId = data.getInt(cols.PARENT_ID.ordinal());
-                item.image = data.getString(cols.IMAGE.ordinal());
-                item.content = data.getString(cols.CONTENT.ordinal());
-                m_itemsList.add(item);
-                data.moveToNext();
-            }
-        }
-
-        Cursor currentData = myDbHelper.getCurrentValue(m_currentId);
-        if (currentData.moveToFirst()) {
-            while ( !currentData.isAfterLast() ) {
-                DBItem item = new DBItem();
-                item.id = currentData.getInt(cols.ID.ordinal());
-                item.name = currentData.getString(cols.NAME.ordinal());
-                item.comment = currentData.getString(cols.COMMENT.ordinal());
-                item.parentId = currentData.getInt(cols.PARENT_ID.ordinal());
-                item.image = currentData.getString(cols.IMAGE.ordinal());
-                item.content = currentData.getString(cols.CONTENT.ordinal());
-                m_currentItem = item;
-                currentData.moveToNext();
-            }
-        }
-        IS_MENU = myDbHelper.isItMenu(m_currentId);
+        m_itemsList = myApp.getDBValues(m_currentId);
+        m_currentItem = myApp.getCurrentValue(m_currentId);
+        IS_MENU = myApp.isItMenu(m_currentId);
     }
 
     protected void printImage()
@@ -336,15 +309,11 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         b.setLayoutParams(params);
         b.setId(USER_ID);
-        final Activity tmp = this;
-        final MyApplication myApp = (MyApplication)this.getApplication();
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse("market://details?id=" + getPackageName());
                 Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
-                // To count with Play market backstack, After pressing back button,
-                // to taken back to our application, we need to add following flags to intent.
                 goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
                         Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
                         Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
@@ -394,9 +363,9 @@ public class PatternMenuActivity extends AppCompatActivity {
         ArrayList<Integer> used = new ArrayList<>();
         for(int i = 0; i < 3; i++)
         {
-            DBItem item =  myDbHelper.getRandomItem();
+            DBItem item =  myApp.getRandomItem();
             while (item == null || used.contains(item.id))
-                item =  myDbHelper.getRandomItem();
+                item =  myApp.getRandomItem();
 
             used.add(item.id);
 

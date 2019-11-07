@@ -113,53 +113,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             mNeedUpdate = true;
     }
 
-    public Cursor getDBValues(int id)
-    {
-        return mDataBase.query(TABLE_NAME, null, PARENT_ID + "=" + String.valueOf(id), null, null, null, ID);
-
+    public Cursor getAllItems() {
+        return mDataBase.query(TABLE_NAME, null, null, null, null, null, ID);
     }
 
-    public Cursor getCurrentValue(int id)
-    {
-        return mDataBase.query(TABLE_NAME, null, ID + "=" + String.valueOf(id), null, null, null, ID);
-    }
-
-    public boolean isItMenu(int id)
-    {
-        Cursor data = mDataBase.query(TABLE_NAME, null, PARENT_ID + "=" + String.valueOf(id), null, null, null, ID);
-        return data.moveToFirst();
-    }
-
-    DBItem getRandomItem()
-    {
-        int numRows = (int) DatabaseUtils.queryNumEntries(mDataBase, "main");
-        ArrayList<Integer> ids = new ArrayList<>();
-        String[] idString = {"_id"};
-        Cursor query1 =  mDataBase.query(TABLE_NAME, idString, null, null, null, null, ID);
-        if (query1.moveToFirst()) {
-            while (!query1.isAfterLast()) {
-                ids.add(query1.getInt(PatternMenuActivity.cols.ID.ordinal()));
-                query1.moveToNext();
-            }
-        }
-
-        Random r = new Random();
-        int rId = ids.get(r.nextInt(numRows));
-        Cursor query =  mDataBase.query(TABLE_NAME, null, ID + "=" + String.valueOf(rId), null, null, null, ID);
-        DBItem item = new DBItem();
-        if (query.moveToFirst()) {
-            while (!query.isAfterLast()) {
-                item.id = query.getInt(PatternMenuActivity.cols.ID.ordinal());
-                item.name = query.getString(PatternMenuActivity.cols.NAME.ordinal());
-                item.comment = query.getString(PatternMenuActivity.cols.COMMENT.ordinal());
-                item.parentId = query.getInt(PatternMenuActivity.cols.PARENT_ID.ordinal());
-                item.image = query.getString(PatternMenuActivity.cols.IMAGE.ordinal());
-                item.content = query.getString(PatternMenuActivity.cols.CONTENT.ordinal());
-                query.close();
-                return item;
-            }
-        }
-        query.close();
-        return null;
-    }
 }

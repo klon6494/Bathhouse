@@ -45,14 +45,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:orientation="vertical"
-            android:background="@color/colorHeader">
+            android:background="@color/colorHeader"
+            android:paddingTop="0dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/colorHeader"/>
 
             <com.google.android.gms.ads.doubleclick.PublisherAdView
                 android:id="@+id/publisherAdView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
                 app:adSize="BANNER"
                 app:adUnitId="ca-app-pub-3564080458767960/8494745538">
             </com.google.android.gms.ads.doubleclick.PublisherAdView>

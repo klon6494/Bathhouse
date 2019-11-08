@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".PatternMenuActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -16,25 +16,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ScrollView
+        <ImageView
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true" />
+
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/buttonsLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/imageView"
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="230dp" />
+                <!--<TextView
+                    android:id="@+id/headerText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="0"
-                    android:adjustViewBounds="true" />
-
+                    android:textAlignment="center"
+                    android:textSize="30sp" />-->
             </LinearLayout>
 
         </ScrollView>
@@ -43,15 +54,15 @@
             android:id="@+id/adsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
             android:orientation="vertical"
             android:background="@color/colorHeader"
-            android:paddingTop="0dp">
+            android:paddingTop="0dp"
+            android:layout_alignParentBottom="true">
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:background="@color/colorHeader"/>
+                android:background="@color/colorHeader" />
 
             <com.google.android.gms.ads.doubleclick.PublisherAdView
                 android:id="@+id/publisherAdView"
@@ -62,6 +73,6 @@
             </com.google.android.gms.ads.doubleclick.PublisherAdView>
         </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

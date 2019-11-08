@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,10 +23,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
@@ -76,6 +81,43 @@ public class PatternMenuActivity extends AppCompatActivity {
         generateAds();
         getValues();
         fillWindow();
+        amazingScroll();
+    }
+
+
+
+    protected void amazingScroll()
+    {
+        /* intially hide the view */
+        //final TextView heading = findViewById(R.id.headerText);
+        //heading.setText(m_currentItem.name);
+        final ScrollView scrollView = findViewById(R.id.scrollView);
+        final ImageView parallaxImage =  findViewById(R.id.imageView);
+
+       // LinearLayout layout = (LinearLayout) findViewById(R.id.buttonsLayout);
+        //ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) layout.getLayoutParams();
+        //params.topMargin = parallaxImage.getHeight();
+
+
+        //heading.setAlpha(0f);
+        /* set the scroll change listener on scrollview */
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                /* get the maximum height which we have scroll before performing any action */
+                int maxDistance = parallaxImage.getHeight();
+                /* how much we have scrolled */
+                int movement = scrollView.getScrollY();
+                /*finally calculate the alpha factor and set on the view */
+                //float alphaFactor = ((movement * 1.0f) / (maxDistance - heading.getHeight()));
+                if (movement >= 0 && movement <= maxDistance) {
+                    /*for image parallax with scroll */
+                    parallaxImage.setTranslationY(-movement/2);
+                    /* set visibility */
+                    //heading.setAlpha(alphaFactor);
+                }
+            }
+        });
     }
 
     public void addListenerOnPicture() {
@@ -190,6 +232,11 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setBackground(shape);
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
+
+        Drawable img = getDrawable(getResources().getIdentifier(item.image, "drawable", getPackageName()));
+        img.setBounds( 0, 0, 320, 180 );
+        b.setCompoundDrawables(img, null, null, null);
+
         return b;
     }
 
@@ -245,11 +292,13 @@ public class PatternMenuActivity extends AppCompatActivity {
     }
 
     protected void setBackGroundAndTitle() {
+
         final int sdk = android.os.Build.VERSION.SDK_INT;
+
         if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            ((LinearLayout)findViewById(R.id.linearLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
+            ((RelativeLayout)findViewById(R.id.linearLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
         } else {
-            ((LinearLayout)findViewById(R.id.linearLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
+            ((RelativeLayout)findViewById(R.id.linearLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
         }
 
         if(m_currentItem.id < 1) {
@@ -398,6 +447,17 @@ public class PatternMenuActivity extends AppCompatActivity {
             else
                 printRateButton();
         }
+        kostilScroll();
+    }
+
+    protected void kostilScroll()
+    {
+        View v = new View(this);
+        v.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                300));
+
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(v);
     }
 
     @Override

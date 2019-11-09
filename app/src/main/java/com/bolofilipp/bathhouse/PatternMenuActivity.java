@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -181,15 +182,21 @@ public class PatternMenuActivity extends AppCompatActivity {
         });
 
         GradientDrawable shape =  new GradientDrawable();
-        shape.setCornerRadius(50);
+        shape.setCornerRadius(30);
 
         shape.setColor(getColor(R.color.colorButton));
 
-        shape.setAlpha(170);
-        b.setPadding(40,40,40,40);
+        shape.setAlpha(255);
+        b.setPadding(20,20,20,20);
         b.setBackground(shape);
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
+
+        Drawable img = getDrawable(getResources().getIdentifier(item.image, "drawable", getPackageName()));
+        img.setBounds( 0, 0, 320, 180 );
+        b.setCompoundDrawables(img, null, null, null);
+
+
         return b;
     }
 
@@ -238,19 +245,17 @@ public class PatternMenuActivity extends AppCompatActivity {
         else if(m_currentId == 0 || m_currentId == ABOUT_ID)
         {
             ImageView iv = (ImageView)findViewById(R.id.imageView);
-
             iv.setImageResource(R.drawable.main);
-            iv.setMaxHeight(500);
         }
     }
 
     protected void setBackGroundAndTitle() {
-        final int sdk = android.os.Build.VERSION.SDK_INT;
+       /* final int sdk = android.os.Build.VERSION.SDK_INT;
         if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
             ((LinearLayout)findViewById(R.id.linearLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
         } else {
             ((LinearLayout)findViewById(R.id.linearLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
-        }
+        }*/
 
         if(m_currentItem.id < 1) {
             setTitle(R.string.app_name);
@@ -351,7 +356,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         interest.setId(USER_ID+1000);
         interest.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         interest.setGravity(View.TEXT_ALIGNMENT_CENTER);
-        interest.setBackgroundColor(getColor(R.color.colorHeader));
+        //interest.setBackgroundColor(getColor(R.color.colorHeader));
         LinearLayout.LayoutParams paramsi = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT);

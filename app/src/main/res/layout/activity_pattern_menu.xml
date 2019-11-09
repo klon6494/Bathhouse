@@ -45,13 +45,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:orientation="vertical"
-            android:background="@color/colorHeader"
+            android:background="@color/colorBackground"
             android:paddingTop="0dp">
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
-                android:background="@color/colorHeader"/>
+                android:background="@color/colorBackground"/>
 
             <com.google.android.gms.ads.doubleclick.PublisherAdView
                 android:id="@+id/publisherAdView"

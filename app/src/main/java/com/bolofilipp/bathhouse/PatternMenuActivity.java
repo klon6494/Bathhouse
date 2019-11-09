@@ -195,7 +195,7 @@ public class PatternMenuActivity extends AppCompatActivity {
             }
         });
     }
-    protected Button generateButton(DBItem item)
+    protected RelativeLayout generateButton(DBItem item)
     {
         Button b = new Button(getApplicationContext());
 
@@ -268,14 +268,51 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setBackground(shape);
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
-        b.setTransitionName(item.image);
 
-        Drawable img = getDrawable(getResources().getIdentifier(item.image, "drawable", getPackageName()));
+
+        /*Drawable img = getDrawable(getResources().getIdentifier(item.image, "drawable", getPackageName()));
         img.setBounds( 0, 0, 320, 180 );
-        b.setCompoundDrawables(img, null, null, null);
+        b.setCompoundDrawables(img, null, null, null);*/
 
 
-        return b;
+
+        ImageView imageView = new ImageView(this);
+        imageView.setImageResource(getResources().getIdentifier(item.image, "drawable", getPackageName()));
+
+        RelativeLayout.LayoutParams lp_im = new RelativeLayout.LayoutParams(320,180);
+        lp_im.addRule(RelativeLayout.ALIGN_LEFT, b.getId());
+        //lp_im.addRule(RelativeLayout.ALIGN_TOP, b.getId());
+        lp_im.addRule(RelativeLayout.CENTER_VERTICAL, b.getId());
+        lp_im.setMargins(15,0,0,0);
+
+        imageView.setLayoutParams(lp_im);
+        imageView.setTransitionName(item.image);
+        imageView.setAdjustViewBounds(true);
+
+
+        RelativeLayout rl = new RelativeLayout(getApplicationContext());
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        rl.setLayoutParams(lp);
+        RelativeLayout.LayoutParams lp_tv = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        // Specify the TextView position in parent layout
+        lp_tv.setMargins(10,10,10,10);
+        // Add LayoutParams to TextView
+        b.setLayoutParams(lp_tv);
+        // Set padding for TextView
+        b.setPadding(15 + 320,15,15,15);
+        imageView.setElevation(99999);
+
+        rl.addView(b);
+        rl.addView(imageView);
+        return rl;
     }
 
     public void onBackPressed() {
@@ -372,7 +409,7 @@ public class PatternMenuActivity extends AppCompatActivity {
     {
         for (DBItem item : m_itemsList) {
 
-            Button b = generateButton(item);
+            RelativeLayout b = generateButton(item);
             ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
         }
     }
@@ -475,7 +512,7 @@ public class PatternMenuActivity extends AppCompatActivity {
 
             used.add(item.id);
 
-            Button b = generateButton(item);
+            RelativeLayout b = generateButton(item);
             ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
         }
     }

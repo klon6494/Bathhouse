@@ -1,7 +1,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppTheme" parent="AnimateTheme">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorHeader</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -14,6 +14,18 @@
         <item name="android:colorPrimary">#FFFFFF</item>
         <item name="android:textColorPrimary">#000000</item>
         <item name="android:windowBackground">@drawable/popup_background</item>
+    </style>
+
+    <style name="AnimateTheme" parent="Theme.AppCompat.Light">
+        <item name="android:windowActivityTransitions">true</item>
+
+        <item name="android:windowSharedElementEnterTransition">
+            @transition/select_transition
+        </item>
+
+        <item name="android:windowSharedElementExitTransition">
+            @transition/select_transition
+        </item>
     </style>
 
 </resources>

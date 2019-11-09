@@ -9,7 +9,6 @@ import android.app.ActivityOptions;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -23,14 +22,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
@@ -77,6 +80,40 @@ public class PatternMenuActivity extends AppCompatActivity {
         generateAds();
         getValues();
         fillWindow();
+        amazingScroll();
+    }
+    protected void amazingScroll()
+    {
+        /* intially hide the view */
+        //final TextView heading = findViewById(R.id.headerText);
+        //heading.setText(m_currentItem.name);
+        final ScrollView scrollView = findViewById(R.id.scrollView);
+        final ImageView parallaxImage =  findViewById(R.id.imageView);
+
+        // LinearLayout layout = (LinearLayout) findViewById(R.id.buttonsLayout);
+        //ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) layout.getLayoutParams();
+        //params.topMargin = parallaxImage.getHeight();
+
+
+        //heading.setAlpha(0f);
+        /* set the scroll change listener on scrollview */
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                /* get the maximum height which we have scroll before performing any action */
+                int maxDistance = parallaxImage.getHeight();
+                /* how much we have scrolled */
+                int movement = scrollView.getScrollY();
+                /*finally calculate the alpha factor and set on the view */
+                //float alphaFactor = ((movement * 1.0f) / (maxDistance - heading.getHeight()));
+                if (movement >= 0 && movement <= maxDistance) {
+                    /*for image parallax with scroll */
+                    parallaxImage.setTranslationY(-movement/2);
+                    /* set visibility */
+                    //heading.setAlpha(alphaFactor);
+                }
+            }
+        });
     }
 
     public void addListenerOnPicture() {
@@ -141,6 +178,22 @@ public class PatternMenuActivity extends AppCompatActivity {
         PublisherAdView mPublisherAdView = findViewById(R.id.publisherAdView);
         PublisherAdRequest adRequest = new PublisherAdRequest.Builder().addTestDevice(AdRequest.DEVICE_ID_EMULATOR).build();
         mPublisherAdView.loadAd(adRequest);
+        mPublisherAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        LinearLayout ads = findViewById(R.id.adsLayout);
+                        int adsHeight = ads.getHeight();
+                        ScrollView sv = findViewById(R.id.scrollView);
+                        sv.setPadding(0,0,0,adsHeight);
+                    }
+                }, 100);
+
+            }
+        });
     }
     protected Button generateButton(DBItem item)
     {
@@ -159,11 +212,13 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         b.setLayoutParams(params);
         b.setId(USER_ID + item.id);
+        final String imageName = item.image;
         final Activity tmp = this;
         final MyApplication myApp = (MyApplication)this.getApplication();
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 Bundle bundle = null;
                 ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
                 bundle = options.toBundle();
@@ -177,7 +232,29 @@ public class PatternMenuActivity extends AppCompatActivity {
                     public void run() {
                         finish();
                     }
+                }, 1000);*/
+
+
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp, v, imageName);
+                Bundle bundle = options.toBundle();
+
+                Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
+                intent.putExtra("parentId", v.getId() - USER_ID);
+                myApp.pushStack(m_currentId);
+
+                if (bundle == null) {
+                    startActivity(intent);
+                } else {
+                    startActivity(intent, bundle);
+                }
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        finish();
+                    }
                 }, 1000);
+
             }
         });
 
@@ -191,6 +268,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setBackground(shape);
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
+        b.setTransitionName(item.image);
 
         Drawable img = getDrawable(getResources().getIdentifier(item.image, "drawable", getPackageName()));
         img.setBounds( 0, 0, 320, 180 );
@@ -235,26 +313,49 @@ public class PatternMenuActivity extends AppCompatActivity {
 
     protected void printImage()
     {
+        ImageView imageView = ((ImageView)findViewById(R.id.imageView));
         if(m_currentItem.image != null && !m_currentItem.image.isEmpty())
         {
-            ImageView imageView = ((ImageView)findViewById(R.id.imageView));
             Context context = imageView.getContext();
             int id = context.getResources().getIdentifier(m_currentItem.image, "drawable", context.getPackageName());
             imageView.setImageResource(id);
         }
         else if(m_currentId == 0 || m_currentId == ABOUT_ID)
         {
-            ImageView iv = (ImageView)findViewById(R.id.imageView);
-            iv.setImageResource(R.drawable.main);
+            imageView.setImageResource(R.drawable.main);
+
         }
+
+        imageView.setTransitionName(m_currentItem.image);
+
+
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean focus) {
+        super.onWindowFocusChanged(focus);
+        ImageView imageView = ((ImageView)findViewById(R.id.imageView));
+        int ivHeight = imageView.getHeight();
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(0, ivHeight, 0, 0);
+        LinearLayout ll = findViewById(R.id.buttonsLayout);
+        ll.setLayoutParams(layoutParams);
+
+        View tmp = new View(this);
+        tmp.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                ivHeight));
+
+        ll.addView(tmp);
     }
 
     protected void setBackGroundAndTitle() {
         final int sdk = android.os.Build.VERSION.SDK_INT;
         if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            ((LinearLayout)findViewById(R.id.linearLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
+            ((LinearLayout)findViewById(R.id.buttonsLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
         } else {
-            ((LinearLayout)findViewById(R.id.linearLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
+            ((LinearLayout)findViewById(R.id.buttonsLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
         }
 
         if(m_currentItem.id < 1) {

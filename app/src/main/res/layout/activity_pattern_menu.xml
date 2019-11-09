@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".PatternMenuActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
@@ -16,10 +16,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ScrollView
+        <ImageView
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="0"
+            android:adjustViewBounds="true" />
+
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            >
 
             <LinearLayout
                 android:id="@+id/buttonsLayout"
@@ -27,13 +36,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0"
                 android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/imageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="0"
-                    android:adjustViewBounds="true" />
 
             </LinearLayout>
 
@@ -46,7 +48,8 @@
             android:layout_weight="0"
             android:orientation="vertical"
             android:background="@color/colorBackground"
-            android:paddingTop="0dp">
+            android:paddingTop="0dp"
+            android:layout_alignParentBottom = "true">
 
             <View
                 android:layout_width="match_parent"
@@ -57,11 +60,12 @@
                 android:id="@+id/publisherAdView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 app:adSize="BANNER"
                 app:adUnitId="ca-app-pub-3564080458767960/8494745538">
             </com.google.android.gms.ads.doubleclick.PublisherAdView>
         </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

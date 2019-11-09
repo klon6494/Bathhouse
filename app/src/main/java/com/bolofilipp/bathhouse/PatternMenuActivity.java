@@ -250,12 +250,12 @@ public class PatternMenuActivity extends AppCompatActivity {
     }
 
     protected void setBackGroundAndTitle() {
-       /* final int sdk = android.os.Build.VERSION.SDK_INT;
+        final int sdk = android.os.Build.VERSION.SDK_INT;
         if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
             ((LinearLayout)findViewById(R.id.linearLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
         } else {
             ((LinearLayout)findViewById(R.id.linearLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
-        }*/
+        }
 
         if(m_currentItem.id < 1) {
             setTitle(R.string.app_name);
@@ -356,7 +356,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         interest.setId(USER_ID+1000);
         interest.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         interest.setGravity(View.TEXT_ALIGNMENT_CENTER);
-        //interest.setBackgroundColor(getColor(R.color.colorHeader));
+        interest.setBackgroundColor(getColor(R.color.colorHeader));
         LinearLayout.LayoutParams paramsi = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT);

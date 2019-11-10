@@ -18,7 +18,7 @@
 
     <style name="AnimateTheme" parent="Theme.AppCompat.Light">
         <item name="android:windowActivityTransitions">true</item>
-
+        <item name="android:windowContentTransitions">true</item>
         <item name="android:windowSharedElementEnterTransition">
             @transition/select_transition
         </item>

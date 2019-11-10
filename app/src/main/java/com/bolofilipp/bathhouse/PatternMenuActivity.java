@@ -2,7 +2,9 @@ package com.bolofilipp.bathhouse;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -82,6 +84,9 @@ public class PatternMenuActivity extends AppCompatActivity {
         fillWindow();
         amazingScroll();
     }
+
+
+
     protected void amazingScroll()
     {
         /* intially hide the view */
@@ -234,26 +239,36 @@ public class PatternMenuActivity extends AppCompatActivity {
                     }
                 }, 1000);*/
 
+
                 int idd = v.getId();
-                idd+=999;
+                idd+=13176;
                 ImageView imView = tmp.findViewById(idd);
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp, imView, imageName);
-                Bundle bundle = options.toBundle();
+
+
+
+                //ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp, imView, imageName);
+                //Bundle bundle = options.toBundle();
 
                 Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
                 intent.putExtra("parentId", v.getId() - USER_ID);
                 myApp.pushStack(m_currentId);
 
-                if (bundle == null) {
+                ActivityOptionsCompat options = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation(tmp,
+                                imView,
+                                ViewCompat.getTransitionName(imView));
+                startActivity(intent, options.toBundle());
+
+               /* if (bundle == null) {
                     startActivity(intent);
                 } else {
                     startActivity(intent, bundle);
-                }
+                }*/
 
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
-                        finish();
+                       finish();
                     }
                 }, 1000);
 
@@ -289,7 +304,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         imageView.setTransitionName(item.image);
         imageView.setAdjustViewBounds(true);
         int imageId = b.getId();
-        imageId+=999;
+        imageId+=13176;
         imageView.setId(imageId);
 
         RelativeLayout rl = new RelativeLayout(getApplicationContext());
@@ -426,7 +441,7 @@ public class PatternMenuActivity extends AppCompatActivity {
             tv.setText(Html.fromHtml(m_currentItem.content));
         }
         tv.setTextSize(15);
-        tv.setId(USER_ID+999);
+        tv.setId(USER_ID+99999);
         tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
         tv.setGravity(Gravity.CENTER);
         tv.setBackgroundResource(R.drawable.text_background);

@@ -234,8 +234,10 @@ public class PatternMenuActivity extends AppCompatActivity {
                     }
                 }, 1000);*/
 
-
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp, v, imageName);
+                int idd = v.getId();
+                idd+=999;
+                ImageView imView = tmp.findViewById(idd);
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp, imView, imageName);
                 Bundle bundle = options.toBundle();
 
                 Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
@@ -274,8 +276,6 @@ public class PatternMenuActivity extends AppCompatActivity {
         img.setBounds( 0, 0, 320, 180 );
         b.setCompoundDrawables(img, null, null, null);*/
 
-
-
         ImageView imageView = new ImageView(this);
         imageView.setImageResource(getResources().getIdentifier(item.image, "drawable", getPackageName()));
 
@@ -288,7 +288,9 @@ public class PatternMenuActivity extends AppCompatActivity {
         imageView.setLayoutParams(lp_im);
         imageView.setTransitionName(item.image);
         imageView.setAdjustViewBounds(true);
-
+        int imageId = b.getId();
+        imageId+=999;
+        imageView.setId(imageId);
 
         RelativeLayout rl = new RelativeLayout(getApplicationContext());
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
@@ -302,14 +304,11 @@ public class PatternMenuActivity extends AppCompatActivity {
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
 
-        // Specify the TextView position in parent layout
         lp_tv.setMargins(10,10,10,10);
-        // Add LayoutParams to TextView
         b.setLayoutParams(lp_tv);
-        // Set padding for TextView
         b.setPadding(15 + 320,15,15,15);
         imageView.setElevation(99999);
-
+        b.setMinHeight(200);
         rl.addView(b);
         rl.addView(imageView);
         return rl;

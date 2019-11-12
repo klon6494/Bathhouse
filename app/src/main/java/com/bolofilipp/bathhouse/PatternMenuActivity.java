@@ -82,10 +82,21 @@ public class PatternMenuActivity extends AppCompatActivity {
         generateAds();
         getValues();
         fillWindow();
-        amazingScroll();
+        //amazingScroll();
     }
 
+    protected void deleteAll()
+    {
+        if(((LinearLayout) findViewById(R.id.buttonsLayout)).getChildCount() > 0)
+            ((LinearLayout) findViewById(R.id.buttonsLayout)).removeAllViews();
+    }
 
+    protected void createAll(int id)
+    {
+        m_currentId = id;
+        getValues();
+        fillWindow();
+    }
 
     protected void amazingScroll()
     {
@@ -142,6 +153,9 @@ public class PatternMenuActivity extends AppCompatActivity {
         final MyApplication myApp = (MyApplication)this.getApplication();
         if(m_currentId == 0)
         {
+            deleteAll();
+            createAll(ABOUT_ID);
+            /*
             Bundle bundle = null;
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
             bundle = options.toBundle();
@@ -155,12 +169,14 @@ public class PatternMenuActivity extends AppCompatActivity {
                 public void run() {
                     finish();
                 }
-            }, 1000);
+            }, 1000);*/
         }
 
         if(m_currentId == ABOUT_ID)
         {
-            Bundle bundle = null;
+            deleteAll();
+            createAll(0);
+            /*Bundle bundle = null;
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
             bundle = options.toBundle();
 
@@ -173,7 +189,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                 public void run() {
                     finish();
                 }
-            }, 1000);
+            }, 1000);*/
         }
 
     }
@@ -249,7 +265,9 @@ public class PatternMenuActivity extends AppCompatActivity {
                 //ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp, imView, imageName);
                 //Bundle bundle = options.toBundle();
 
-                Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
+                deleteAll();
+                createAll(v.getId() - USER_ID);
+                /*Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
                 intent.putExtra("parentId", v.getId() - USER_ID);
                 myApp.pushStack(m_currentId);
 
@@ -259,11 +277,11 @@ public class PatternMenuActivity extends AppCompatActivity {
                                 ViewCompat.getTransitionName(imView));
                 startActivity(intent, options.toBundle());
 
-               /* if (bundle == null) {
+                if (bundle == null) {
                     startActivity(intent);
                 } else {
                     startActivity(intent, bundle);
-                }*/
+                }
 
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -271,7 +289,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                        finish();
                     }
                 }, 1000);
-
+*/
             }
         });
 
@@ -339,7 +357,9 @@ public class PatternMenuActivity extends AppCompatActivity {
             super.onBackPressed();
         else
         {
-            Bundle bundle = null;
+            deleteAll();
+            createAll(id);
+            /*Bundle bundle = null;
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this);
             bundle = options.toBundle();
 
@@ -351,7 +371,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                 public void run() {
                     finish();
                 }
-            }, 1000);
+            }, 1000);*/
         }
     }
 

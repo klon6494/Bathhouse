@@ -93,6 +93,11 @@ public class PatternMenuActivity extends AppCompatActivity {
 
     protected void createAll(int id)
     {
+        createAll(id, null);
+    }
+
+    protected void createAll(int id, ImageView imageView)
+    {
         m_currentId = id;
         getValues();
         fillWindow();
@@ -155,41 +160,14 @@ public class PatternMenuActivity extends AppCompatActivity {
         {
             deleteAll();
             createAll(ABOUT_ID);
-            /*
-            Bundle bundle = null;
-            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
-            bundle = options.toBundle();
-
-            Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
-            intent.putExtra("parentId", ABOUT_ID);
             myApp.pushStack(m_currentId);
-            startActivity(intent,bundle);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    finish();
-                }
-            }, 1000);*/
         }
 
         if(m_currentId == ABOUT_ID)
         {
             deleteAll();
             createAll(0);
-            /*Bundle bundle = null;
-            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
-            bundle = options.toBundle();
-
-            Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
-            intent.putExtra("parentId", 0);
             myApp.pushStack(m_currentId);
-            startActivity(intent,bundle);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    finish();
-                }
-            }, 1000);*/
         }
 
     }
@@ -206,17 +184,17 @@ public class PatternMenuActivity extends AppCompatActivity {
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
-                        LinearLayout ads = findViewById(R.id.adsLayout);
+                        /*LinearLayout ads = findViewById(R.id.adsLayout);
                         int adsHeight = ads.getHeight();
                         ScrollView sv = findViewById(R.id.scrollView);
-                        sv.setPadding(0,0,0,adsHeight);
+                        sv.setPadding(0,0,0,adsHeight);*/
                     }
                 }, 100);
 
             }
         });
     }
-    protected RelativeLayout generateButton(DBItem item)
+    protected void generateButton(DBItem item)
     {
         Button b = new Button(getApplicationContext());
 
@@ -233,63 +211,20 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         b.setLayoutParams(params);
         b.setId(USER_ID + item.id);
-        final String imageName = item.image;
         final Activity tmp = this;
         final MyApplication myApp = (MyApplication)this.getApplication();
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*
-                Bundle bundle = null;
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp);
-                bundle = options.toBundle();
 
-                Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
-                intent.putExtra("parentId", v.getId() - USER_ID);
-                myApp.pushStack(m_currentId);
-                startActivity(intent,bundle);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        finish();
-                    }
-                }, 1000);*/
-
-
-                int idd = v.getId();
-                idd+=13176;
-                ImageView imView = tmp.findViewById(idd);
-
-
-
-                //ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(tmp, imView, imageName);
-                //Bundle bundle = options.toBundle();
+                int imageId = v.getId();
+                imageId+=13176;
+                ImageView imView = tmp.findViewById(imageId);
 
                 deleteAll();
-                createAll(v.getId() - USER_ID);
-                /*Intent intent = new Intent(getApplicationContext(), PatternMenuActivity.class);
-                intent.putExtra("parentId", v.getId() - USER_ID);
+                createAll(v.getId() - USER_ID, imView);
                 myApp.pushStack(m_currentId);
 
-                ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(tmp,
-                                imView,
-                                ViewCompat.getTransitionName(imView));
-                startActivity(intent, options.toBundle());
-
-                if (bundle == null) {
-                    startActivity(intent);
-                } else {
-                    startActivity(intent, bundle);
-                }
-
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                       finish();
-                    }
-                }, 1000);
-*/
             }
         });
 
@@ -304,17 +239,11 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
 
-
-        /*Drawable img = getDrawable(getResources().getIdentifier(item.image, "drawable", getPackageName()));
-        img.setBounds( 0, 0, 320, 180 );
-        b.setCompoundDrawables(img, null, null, null);*/
-
         ImageView imageView = new ImageView(this);
         imageView.setImageResource(getResources().getIdentifier(item.image, "drawable", getPackageName()));
 
         RelativeLayout.LayoutParams lp_im = new RelativeLayout.LayoutParams(320,180);
         lp_im.addRule(RelativeLayout.ALIGN_LEFT, b.getId());
-        //lp_im.addRule(RelativeLayout.ALIGN_TOP, b.getId());
         lp_im.addRule(RelativeLayout.CENTER_VERTICAL, b.getId());
         lp_im.setMargins(15,0,0,0);
 
@@ -325,13 +254,6 @@ public class PatternMenuActivity extends AppCompatActivity {
         imageId+=13176;
         imageView.setId(imageId);
 
-        RelativeLayout rl = new RelativeLayout(getApplicationContext());
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
-        );
-
-        rl.setLayoutParams(lp);
         RelativeLayout.LayoutParams lp_tv = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -342,16 +264,12 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setPadding(15 + 320,15,15,15);
         imageView.setElevation(99999);
         b.setMinHeight(200);
-        rl.addView(b);
-        rl.addView(imageView);
-        return rl;
+
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(imageView);
     }
 
     public void onBackPressed() {
-       /* if (m_currentId == 0)
-            return;
-        else*/
-       //super.onBackPressed();
         int id = myApp.popStack();
         if(id < 0)
             super.onBackPressed();
@@ -359,19 +277,6 @@ public class PatternMenuActivity extends AppCompatActivity {
         {
             deleteAll();
             createAll(id);
-            /*Bundle bundle = null;
-            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this);
-            bundle = options.toBundle();
-
-            Intent intent = new Intent(this, PatternMenuActivity.class);
-            intent.putExtra("parentId", id);
-            startActivity(intent, bundle);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    finish();
-                }
-            }, 1000);*/
         }
     }
 
@@ -385,6 +290,9 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void printImage()
     {
         ImageView imageView = ((ImageView)findViewById(R.id.imageView));
+        if(imageView == null)
+            imageView = new ImageView(this);
+
         if(m_currentItem.image != null && !m_currentItem.image.isEmpty())
         {
             Context context = imageView.getContext();
@@ -394,15 +302,10 @@ public class PatternMenuActivity extends AppCompatActivity {
         else if(m_currentId == 0 || m_currentId == ABOUT_ID)
         {
             imageView.setImageResource(R.drawable.main);
-
         }
-
-        imageView.setTransitionName(m_currentItem.image);
-
-
     }
 
-    @Override
+    /*@Override
     public void onWindowFocusChanged(boolean focus) {
         super.onWindowFocusChanged(focus);
         ImageView imageView = ((ImageView)findViewById(R.id.imageView));
@@ -419,7 +322,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                 ivHeight));
 
         ll.addView(tmp);
-    }
+    }*/
 
     protected void setBackGroundAndTitle() {
         final int sdk = android.os.Build.VERSION.SDK_INT;
@@ -442,9 +345,7 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void printButtons()
     {
         for (DBItem item : m_itemsList) {
-
-            RelativeLayout b = generateButton(item);
-            ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
+            generateButton(item);
         }
     }
 
@@ -546,8 +447,7 @@ public class PatternMenuActivity extends AppCompatActivity {
 
             used.add(item.id);
 
-            RelativeLayout b = generateButton(item);
-            ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
+            generateButton(item);
         }
     }
 
@@ -559,8 +459,8 @@ public class PatternMenuActivity extends AppCompatActivity {
         if(m_currentId == 0 || m_currentId == ABOUT_ID)
         {
             addListenerOnPicture();
-            if(m_currentId == 0)
-                getSupportActionBar().hide();
+            /*if(m_currentId == 0)
+                getSupportActionBar().hide();*/
         }
 
         if(IS_MENU)

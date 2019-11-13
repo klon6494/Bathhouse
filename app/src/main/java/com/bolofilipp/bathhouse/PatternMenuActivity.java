@@ -6,6 +6,11 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.ActivityNotFoundException;
@@ -19,17 +24,24 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
+import android.transition.Transition;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -58,8 +70,9 @@ public class PatternMenuActivity extends AppCompatActivity {
     final int USER_ID = 6000;
     DataBaseHelper myDbHelper;
     final int ABOUT_ID = 114;
+    int m_lastElementId = 0;
     MyApplication myApp;
-
+    private Menu m_menu = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,13 +95,24 @@ public class PatternMenuActivity extends AppCompatActivity {
         generateAds();
         getValues();
         fillWindow();
-        //amazingScroll();
+        amazingScroll();
     }
 
     protected void deleteAll()
     {
-        if(((LinearLayout) findViewById(R.id.buttonsLayout)).getChildCount() > 0)
-            ((LinearLayout) findViewById(R.id.buttonsLayout)).removeAllViews();
+        if(((RelativeLayout) findViewById(R.id.buttonsLayout)).getChildCount() > 0)
+            ((RelativeLayout) findViewById(R.id.buttonsLayout)).removeAllViews();
+
+        m_lastElementId = 0;
+
+    }
+
+    private void translate(View viewToMove, View target) {
+        viewToMove.animate()
+                .x(target.getX())
+                .y(target.getY())
+                .setDuration(5000)
+                .start();
     }
 
     protected void createAll(int id)
@@ -99,8 +123,32 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void createAll(int id, ImageView imageView)
     {
         m_currentId = id;
+        ((ScrollView)findViewById(R.id.scrollView)).scrollTo(0,0);
         getValues();
         fillWindow();
+
+        //add empty view to scroll
+        ImageView imageView1 = ((ImageView)findViewById(R.id.imageView));
+        int ivHeight = imageView1.getHeight();
+        RelativeLayout ll = findViewById(R.id.buttonsLayout);
+        View tmp = new View(this);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT, ivHeight) ;
+        lp.addRule(RelativeLayout.BELOW, m_lastElementId);
+        tmp.setLayoutParams(lp);
+        ll.addView(tmp);
+
+        //visible header buttons
+        m_menu.findItem(R.id.home_button).setVisible(m_currentId != 0);
+
+        //анимация появления элементов
+        ArrayList<ObjectAnimator> animators = new ArrayList<>();
+        for (int i = 0; i < ll.getChildCount(); i++) {
+            View v = ll.getChildAt(i);
+            ObjectAnimator anim = ObjectAnimator.ofFloat(v,"alpha", 0.0f ,1.0f);
+            anim.setDuration(200);
+            anim.start();
+        }
     }
 
     protected void amazingScroll()
@@ -126,12 +174,12 @@ public class PatternMenuActivity extends AppCompatActivity {
                 /* how much we have scrolled */
                 int movement = scrollView.getScrollY();
                 /*finally calculate the alpha factor and set on the view */
-                //float alphaFactor = ((movement * 1.0f) / (maxDistance - heading.getHeight()));
+                float alphaFactor = ((movement * 1.0f) / (maxDistance));
                 if (movement >= 0 && movement <= maxDistance) {
                     /*for image parallax with scroll */
                     parallaxImage.setTranslationY(-movement/2);
                     /* set visibility */
-                    //heading.setAlpha(alphaFactor);
+                    //parallaxImage.setAlpha(1.0f-alphaFactor);
                 }
             }
         });
@@ -184,16 +232,53 @@ public class PatternMenuActivity extends AppCompatActivity {
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
-                        /*LinearLayout ads = findViewById(R.id.adsLayout);
+                        LinearLayout ads = findViewById(R.id.adsLayout);
                         int adsHeight = ads.getHeight();
                         ScrollView sv = findViewById(R.id.scrollView);
-                        sv.setPadding(0,0,0,adsHeight);*/
+                        sv.setPadding(0,0,0,adsHeight);
                     }
                 }, 100);
 
             }
         });
     }
+
+    protected void animate(ImageView imView)
+    {
+        //анимация картинки из кнопки наверх
+        ImageView imageView = (ImageView)findViewById(R.id.imageView); //some random value...
+        //int toHeight = findViewById(R.id.imageView).getHeight(); //make it a perfect circlehasAnimationStarted=true;
+
+        ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(imView, "scaleX", ((float) imageView.getWidth())/((float) imView.getWidth()));
+        ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(imView, "scaleY", ((float) imageView.getHeight())/((float) imView.getHeight()));
+        scaleDownX.setDuration(200);
+        scaleDownY.setDuration(200);
+
+        //Костыль, нодо подогнать ровную высоту
+        ObjectAnimator animatorY = ObjectAnimator.ofFloat(imView, View.Y, findViewById(R.id.scrollView).getScrollY()-((float)(imageView.getHeight())/2) - (float)findViewById(m_lastElementId).getHeight()/2+10);
+        animatorY.setDuration(200);
+        ObjectAnimator animatorX = ObjectAnimator.ofFloat(imView, View.X, imageView.getX() + (float)imageView.getWidth()  / 2 - (float)imView.getWidth()/2);//findViewById(m_lastElementId).getWidth() / 2);
+        animatorX.setDuration(200);
+
+        AnimatorSet scaleDown = new AnimatorSet();
+        scaleDown.play(scaleDownX).with(scaleDownY).with(animatorY).with(animatorX);
+        scaleDown.start();
+
+        //анимация всех элементов
+        ArrayList<ObjectAnimator> animators = new ArrayList<>();
+        RelativeLayout layout = (RelativeLayout)findViewById(R.id.buttonsLayout);
+        for (int i = 0; i < layout.getChildCount(); i++) {
+            View v = layout.getChildAt(i);
+            if(v.getId() == imView.getId())
+                continue;
+            ObjectAnimator anim = ObjectAnimator.ofFloat(v,"alpha",0.0f);
+            anim.setDuration(200);
+            anim.start();
+        }
+        scaleDownX.setDuration(200);
+        scaleDownY.setDuration(200);
+    }
+
     protected void generateButton(DBItem item)
     {
         Button b = new Button(getApplicationContext());
@@ -219,11 +304,20 @@ public class PatternMenuActivity extends AppCompatActivity {
 
                 int imageId = v.getId();
                 imageId+=13176;
-                ImageView imView = tmp.findViewById(imageId);
-
-                deleteAll();
-                createAll(v.getId() - USER_ID, imView);
+                final ImageView imView = tmp.findViewById(imageId);
                 myApp.pushStack(m_currentId);
+
+                animate((ImageView) findViewById(imageId));
+
+                final int bId = v.getId();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable(){
+                    public void run() {
+                        deleteAll();
+                        createAll(bId - USER_ID, imView);
+                    }
+                }, 200);
+
 
             }
         });
@@ -239,20 +333,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
 
-        ImageView imageView = new ImageView(this);
-        imageView.setImageResource(getResources().getIdentifier(item.image, "drawable", getPackageName()));
 
-        RelativeLayout.LayoutParams lp_im = new RelativeLayout.LayoutParams(320,180);
-        lp_im.addRule(RelativeLayout.ALIGN_LEFT, b.getId());
-        lp_im.addRule(RelativeLayout.CENTER_VERTICAL, b.getId());
-        lp_im.setMargins(15,0,0,0);
-
-        imageView.setLayoutParams(lp_im);
-        imageView.setTransitionName(item.image);
-        imageView.setAdjustViewBounds(true);
-        int imageId = b.getId();
-        imageId+=13176;
-        imageView.setId(imageId);
 
         RelativeLayout.LayoutParams lp_tv = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -260,13 +341,36 @@ public class PatternMenuActivity extends AppCompatActivity {
         );
 
         lp_tv.setMargins(10,10,10,10);
+        if(m_lastElementId !=0)
+            lp_tv.addRule(RelativeLayout.BELOW, m_lastElementId);
+
         b.setLayoutParams(lp_tv);
         b.setPadding(15 + 320,15,15,15);
-        imageView.setElevation(99999);
+
         b.setMinHeight(200);
 
-        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
-        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(imageView);
+        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(b);
+
+        ImageView imageView = new ImageView(this);
+        imageView.setImageResource(getResources().getIdentifier(item.image, "drawable", getPackageName()));
+        imageView.setElevation(999);
+
+        imageView.setAdjustViewBounds(true);
+        int imageId = b.getId();
+        imageId+=13176;
+        imageView.setId(imageId);
+
+        m_lastElementId = b.getId();
+        RelativeLayout.LayoutParams lp_im = new RelativeLayout.LayoutParams(320,180);
+        lp_im.setMargins(15,10,0,0);
+        lp_im.addRule(RelativeLayout.ALIGN_LEFT, m_lastElementId);
+        lp_im.addRule(RelativeLayout.ALIGN_TOP, m_lastElementId);
+        imageView.setLayoutParams(lp_im);
+
+
+        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(imageView);
+
+
     }
 
     public void onBackPressed() {
@@ -305,7 +409,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         }
     }
 
-    /*@Override
+    @Override
     public void onWindowFocusChanged(boolean focus) {
         super.onWindowFocusChanged(focus);
         ImageView imageView = ((ImageView)findViewById(R.id.imageView));
@@ -313,25 +417,20 @@ public class PatternMenuActivity extends AppCompatActivity {
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, ivHeight, 0, 0);
-        LinearLayout ll = findViewById(R.id.buttonsLayout);
+
+        RelativeLayout ll = findViewById(R.id.buttonsLayout);
         ll.setLayoutParams(layoutParams);
-
-        View tmp = new View(this);
-        tmp.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                ivHeight));
-
-        ll.addView(tmp);
-    }*/
+    }
 
     protected void setBackGroundAndTitle() {
         final int sdk = android.os.Build.VERSION.SDK_INT;
-        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            ((LinearLayout)findViewById(R.id.buttonsLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background) );
-        } else {
-            ((LinearLayout)findViewById(R.id.buttonsLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
-        }
 
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            ((RelativeLayout)findViewById(R.id.relativeLayout)).setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.background));
+        } else {
+            ((RelativeLayout)findViewById(R.id.relativeLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
+        }
+        //((RelativeLayout)findViewById(R.id.buttonsLayout)).setBackground(ContextCompat.getDrawable(this, R.drawable.background));
         if(m_currentItem.id < 1) {
             setTitle(R.string.app_name);
         }
@@ -363,7 +462,8 @@ public class PatternMenuActivity extends AppCompatActivity {
         }
         tv.setTextSize(15);
         tv.setId(USER_ID+99999);
-        tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        RelativeLayout.LayoutParams pp = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        tv.setLayoutParams(pp);
         tv.setGravity(Gravity.CENTER);
         tv.setBackgroundResource(R.drawable.text_background);
 
@@ -371,7 +471,9 @@ public class PatternMenuActivity extends AppCompatActivity {
         llp.setMargins(10, 10, 10, 10); // llp.setMargins(left, top, right, bottom);
         tv.setLayoutParams(llp);
         tv.setTextColor(Color.BLACK);
-        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(tv);
+        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(tv);
+        m_lastElementId = tv.getId();
+
     }
 
     protected void printRateButton()
@@ -380,13 +482,14 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         b.setText(Html.fromHtml("<b><big>Оценить приложение</big></b>"));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(10,10,10,10);
-
+        params.addRule(RelativeLayout.ALIGN_BOTTOM, m_lastElementId);
         b.setLayoutParams(params);
         b.setId(USER_ID);
+        m_lastElementId = b.getId();
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -415,7 +518,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
 
-        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
+        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(b);
     }
 
     protected void printRandomButtons()
@@ -430,13 +533,17 @@ public class PatternMenuActivity extends AppCompatActivity {
         interest.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         interest.setGravity(View.TEXT_ALIGNMENT_CENTER);
         interest.setBackgroundColor(getColor(R.color.colorHeader));
-        LinearLayout.LayoutParams paramsi = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
+        RelativeLayout.LayoutParams paramsi = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT);
         paramsi.setMargins(0,20,0,20);
+        if(m_lastElementId !=0)
+            paramsi.addRule(RelativeLayout.BELOW, m_lastElementId);
+        m_lastElementId = interest.getId();
+
         interest.setPadding(10,0,0,0);
         interest.setLayoutParams(paramsi);
-        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(interest);
+        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(interest);
 
         ArrayList<Integer> used = new ArrayList<>();
         for(int i = 0; i < 3; i++)
@@ -446,7 +553,9 @@ public class PatternMenuActivity extends AppCompatActivity {
                 item =  myApp.getRandomItem();
 
             used.add(item.id);
-
+            int ffsf = 111;
+            if(item.image == null)
+                ffsf = 99;
             generateButton(item);
         }
     }
@@ -481,11 +590,12 @@ public class PatternMenuActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
+        MenuItem item = menu.findItem(R.id.home_button);
         if(m_currentId < 1)
-        {
-            MenuItem item = menu.findItem(R.id.home_button);
             item.setVisible(false);
-        }
+        else
+            item.setVisible(true);
+        m_menu = menu;
         return true;
     }
 
@@ -495,21 +605,9 @@ public class PatternMenuActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.home_button:
-                Bundle bundle = null;
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this);
-                bundle = options.toBundle();
-
-                Intent intent = new Intent(this, PatternMenuActivity.class);
-                intent.putExtra("parentId", 0);
-                MyApplication myApp = (MyApplication)this.getApplication();
                 myApp.pushStack(m_currentId);
-                startActivity(intent, bundle);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        finish();
-                    }
-                }, 1000);
+                deleteAll();
+                createAll(0);
                 return true;
             case android.R.id.home:
                 onBackPressed();

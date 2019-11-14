@@ -22,28 +22,25 @@
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
             android:adjustViewBounds="true" />
 
         <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:clipChildren="false"
             android:clipToPadding="false">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/buttonsLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
+                android:layout_height="wrap_content"
                 android:clipChildren="false"
                 android:clipToPadding="false"
 
                 android:orientation="vertical">
 
-            </RelativeLayout>
+            </LinearLayout>
 
         </ScrollView>
 
@@ -51,7 +48,6 @@
             android:id="@+id/adsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
             android:orientation="vertical"
             android:background="@color/colorBackground"
             android:paddingTop="0dp"
@@ -65,7 +61,7 @@
             <com.google.android.gms.ads.doubleclick.PublisherAdView
                 android:id="@+id/publisherAdView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="1"
                 app:adSize="BANNER"
                 app:adUnitId="ca-app-pub-3564080458767960/8494745538">

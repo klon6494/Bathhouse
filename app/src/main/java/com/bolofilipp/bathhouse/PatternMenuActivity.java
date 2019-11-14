@@ -17,6 +17,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -55,14 +56,7 @@ import java.util.ArrayList;
 
 public class PatternMenuActivity extends AppCompatActivity {
 
-    enum cols {
-        ID,
-        NAME,
-        COMMENT,
-        PARENT_ID,
-        IMAGE,
-        CONTENT
-    }
+
     int m_currentId = -1;
     ArrayList<DBItem> m_itemsList = new ArrayList<>();
     DBItem m_currentItem = new DBItem();
@@ -70,7 +64,6 @@ public class PatternMenuActivity extends AppCompatActivity {
     final int USER_ID = 6000;
     DataBaseHelper myDbHelper;
     final int ABOUT_ID = 114;
-    int m_lastElementId = 0;
     MyApplication myApp;
     private Menu m_menu = null;
     @Override
@@ -100,19 +93,8 @@ public class PatternMenuActivity extends AppCompatActivity {
 
     protected void deleteAll()
     {
-        if(((RelativeLayout) findViewById(R.id.buttonsLayout)).getChildCount() > 0)
-            ((RelativeLayout) findViewById(R.id.buttonsLayout)).removeAllViews();
-
-        m_lastElementId = 0;
-
-    }
-
-    private void translate(View viewToMove, View target) {
-        viewToMove.animate()
-                .x(target.getX())
-                .y(target.getY())
-                .setDuration(5000)
-                .start();
+        if(((LinearLayout) findViewById(R.id.buttonsLayout)).getChildCount() > 0)
+            ((LinearLayout) findViewById(R.id.buttonsLayout)).removeAllViews();
     }
 
     protected void createAll(int id)
@@ -130,11 +112,11 @@ public class PatternMenuActivity extends AppCompatActivity {
         //add empty view to scroll
         ImageView imageView1 = ((ImageView)findViewById(R.id.imageView));
         int ivHeight = imageView1.getHeight();
-        RelativeLayout ll = findViewById(R.id.buttonsLayout);
+        LinearLayout ll = findViewById(R.id.buttonsLayout);
         View tmp = new View(this);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT, ivHeight) ;
-        lp.addRule(RelativeLayout.BELOW, m_lastElementId);
+                RelativeLayout.LayoutParams.MATCH_PARENT, ivHeight);
+        //lp.addRule(RelativeLayout.BELOW, m_lastElementId);
         tmp.setLayoutParams(lp);
         ll.addView(tmp);
 
@@ -195,14 +177,12 @@ public class PatternMenuActivity extends AppCompatActivity {
             public void onClick(View arg0) {
                 onPictureClicked();
             }
-
         });
 
     }
 
     protected void onPictureClicked()
     {
-        final Activity tmp = this;
         final MyApplication myApp = (MyApplication)this.getApplication();
         if(m_currentId == 0)
         {
@@ -243,11 +223,25 @@ public class PatternMenuActivity extends AppCompatActivity {
         });
     }
 
+    public Rect locateView(View view) {
+        Rect loc = new Rect();
+        int[] location = new int[2];
+        if (view == null) {
+            return loc;
+        }
+        view.getLocationInWindow(location);
+
+        loc.left = location[0];
+        loc.top = location[1];
+        loc.right = loc.left + view.getWidth();
+        loc.bottom = loc.top + view.getHeight();
+        return loc;
+    }
+
     protected void animate(ImageView imView)
     {
         //анимация картинки из кнопки наверх
         ImageView imageView = (ImageView)findViewById(R.id.imageView); //some random value...
-        //int toHeight = findViewById(R.id.imageView).getHeight(); //make it a perfect circlehasAnimationStarted=true;
 
         ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(imView, "scaleX", ((float) imageView.getWidth())/((float) imView.getWidth()));
         ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(imView, "scaleY", ((float) imageView.getHeight())/((float) imView.getHeight()));
@@ -255,7 +249,11 @@ public class PatternMenuActivity extends AppCompatActivity {
         scaleDownY.setDuration(200);
 
         //Костыль, нодо подогнать ровную высоту
-        ObjectAnimator animatorY = ObjectAnimator.ofFloat(imView, View.Y, findViewById(R.id.scrollView).getScrollY()-((float)(imageView.getHeight())/2) - (float)findViewById(m_lastElementId).getHeight()/2+10);
+        Rect rectf = new Rect();
+        int buttonId = imView.getId();
+        findViewById(buttonId).getGlobalVisibleRect(rectf);
+        buttonId-= 13176;
+        ObjectAnimator animatorY = ObjectAnimator.ofFloat(imView, View.Y, -rectf.top + imageView.getHeight() - ((float)findViewById(buttonId).getHeight())/2f);
         animatorY.setDuration(200);
         ObjectAnimator animatorX = ObjectAnimator.ofFloat(imView, View.X, imageView.getX() + (float)imageView.getWidth()  / 2 - (float)imView.getWidth()/2);//findViewById(m_lastElementId).getWidth() / 2);
         animatorX.setDuration(200);
@@ -266,14 +264,22 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         //анимация всех элементов
         ArrayList<ObjectAnimator> animators = new ArrayList<>();
-        RelativeLayout layout = (RelativeLayout)findViewById(R.id.buttonsLayout);
+        LinearLayout layout = (LinearLayout)findViewById(R.id.buttonsLayout);
         for (int i = 0; i < layout.getChildCount(); i++) {
             View v = layout.getChildAt(i);
-            if(v.getId() == imView.getId())
-                continue;
-            ObjectAnimator anim = ObjectAnimator.ofFloat(v,"alpha",0.0f);
-            anim.setDuration(200);
-            anim.start();
+            if(v instanceof RelativeLayout)
+            {
+                RelativeLayout rl = (RelativeLayout)v;
+                for( int j = 0; j < rl.getChildCount(); j++) {
+                    View vv = rl.getChildAt(j);
+                    if(vv.getId() != imView.getId())
+                    {
+                        ObjectAnimator anim = ObjectAnimator.ofFloat(vv,"alpha",0.0f);
+                        anim.setDuration(200);
+                        anim.start();
+                    }
+                }
+            }
         }
         scaleDownX.setDuration(200);
         scaleDownY.setDuration(200);
@@ -335,21 +341,17 @@ public class PatternMenuActivity extends AppCompatActivity {
 
 
 
-        RelativeLayout.LayoutParams lp_tv = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT
+        LinearLayout.LayoutParams lp_tv = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
         );
 
         lp_tv.setMargins(10,10,10,10);
-        if(m_lastElementId !=0)
-            lp_tv.addRule(RelativeLayout.BELOW, m_lastElementId);
 
         b.setLayoutParams(lp_tv);
         b.setPadding(15 + 320,15,15,15);
 
         b.setMinHeight(200);
-
-        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(b);
 
         ImageView imageView = new ImageView(this);
         imageView.setImageResource(getResources().getIdentifier(item.image, "drawable", getPackageName()));
@@ -360,16 +362,24 @@ public class PatternMenuActivity extends AppCompatActivity {
         imageId+=13176;
         imageView.setId(imageId);
 
-        m_lastElementId = b.getId();
         RelativeLayout.LayoutParams lp_im = new RelativeLayout.LayoutParams(320,180);
         lp_im.setMargins(15,10,0,0);
-        lp_im.addRule(RelativeLayout.ALIGN_LEFT, m_lastElementId);
-        lp_im.addRule(RelativeLayout.ALIGN_TOP, m_lastElementId);
+        lp_im.addRule(RelativeLayout.ALIGN_LEFT, b.getId());
+        lp_im.addRule(RelativeLayout.CENTER_VERTICAL, b.getId());
         imageView.setLayoutParams(lp_im);
 
+        RelativeLayout rl = new RelativeLayout(this);
+        RelativeLayout.LayoutParams lp_rl = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        rl.setClipChildren(false);
+        rl.setClipToPadding(false);
+        rl.setLayoutParams(lp_rl);
+        rl.addView(b);
+        rl.addView(imageView);
 
-        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(imageView);
-
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(rl);
 
     }
 
@@ -418,7 +428,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, ivHeight, 0, 0);
 
-        RelativeLayout ll = findViewById(R.id.buttonsLayout);
+        LinearLayout ll = findViewById(R.id.buttonsLayout);
         ll.setLayoutParams(layoutParams);
     }
 
@@ -471,8 +481,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         llp.setMargins(10, 10, 10, 10); // llp.setMargins(left, top, right, bottom);
         tv.setLayoutParams(llp);
         tv.setTextColor(Color.BLACK);
-        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(tv);
-        m_lastElementId = tv.getId();
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(tv);
 
     }
 
@@ -486,10 +495,10 @@ public class PatternMenuActivity extends AppCompatActivity {
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(10,10,10,10);
-        params.addRule(RelativeLayout.ALIGN_BOTTOM, m_lastElementId);
+        //params.addRule(RelativeLayout.ALIGN_BOTTOM, m_lastElementId);
         b.setLayoutParams(params);
         b.setId(USER_ID);
-        m_lastElementId = b.getId();
+        //m_lastElementId = b.getId();
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -518,7 +527,7 @@ public class PatternMenuActivity extends AppCompatActivity {
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
 
-        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(b);
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(b);
     }
 
     protected void printRandomButtons()
@@ -537,13 +546,10 @@ public class PatternMenuActivity extends AppCompatActivity {
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.MATCH_PARENT);
         paramsi.setMargins(0,20,0,20);
-        if(m_lastElementId !=0)
-            paramsi.addRule(RelativeLayout.BELOW, m_lastElementId);
-        m_lastElementId = interest.getId();
 
         interest.setPadding(10,0,0,0);
         interest.setLayoutParams(paramsi);
-        ((RelativeLayout)findViewById(R.id.buttonsLayout)).addView(interest);
+        ((LinearLayout)findViewById(R.id.buttonsLayout)).addView(interest);
 
         ArrayList<Integer> used = new ArrayList<>();
         for(int i = 0; i < 3; i++)

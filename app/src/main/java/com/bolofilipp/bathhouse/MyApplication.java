@@ -3,19 +3,12 @@ package com.bolofilipp.bathhouse;
 import android.app.Application;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.SQLException;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.Stack;
 
 public class MyApplication extends Application {
@@ -23,6 +16,15 @@ public class MyApplication extends Application {
     private DataBaseHelper m_db;
     private Stack<Integer> backStack = new Stack<>();
     private HashMap<Integer, DBItem> m_dbItemMap;
+
+    enum cols {
+        ID,
+        NAME,
+        COMMENT,
+        PARENT_ID,
+        IMAGE,
+        CONTENT
+    }
 
     public Integer stackSize()
     {
@@ -62,12 +64,12 @@ public class MyApplication extends Application {
         if (query.moveToFirst()) {
             while (!query.isAfterLast()) {
                 DBItem item = new DBItem();
-                item.id = query.getInt(PatternMenuActivity.cols.ID.ordinal());
-                item.name = query.getString(PatternMenuActivity.cols.NAME.ordinal());
-                item.comment = query.getString(PatternMenuActivity.cols.COMMENT.ordinal());
-                item.parentId = query.getInt(PatternMenuActivity.cols.PARENT_ID.ordinal());
-                item.image = query.getString(PatternMenuActivity.cols.IMAGE.ordinal());
-                item.content = query.getString(PatternMenuActivity.cols.CONTENT.ordinal());
+                item.id = query.getInt(cols.ID.ordinal());
+                item.name = query.getString(cols.NAME.ordinal());
+                item.comment = query.getString(cols.COMMENT.ordinal());
+                item.parentId = query.getInt(cols.PARENT_ID.ordinal());
+                item.image = query.getString(cols.IMAGE.ordinal());
+                item.content = query.getString(cols.CONTENT.ordinal());
                 m_dbItemMap.put(item.id, item);
                 query.moveToNext();
             }

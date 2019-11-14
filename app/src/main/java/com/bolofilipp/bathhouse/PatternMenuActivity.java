@@ -2,47 +2,33 @@ package com.bolofilipp.bathhouse;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
-import android.transition.Transition;
-import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -54,40 +40,32 @@ import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
 import java.util.ArrayList;
 
+import static java.lang.Math.abs;
+
 public class PatternMenuActivity extends AppCompatActivity {
 
-
-    int m_currentId = -1;
-    ArrayList<DBItem> m_itemsList = new ArrayList<>();
-    DBItem m_currentItem = new DBItem();
-    boolean IS_MENU = true;
-    final int USER_ID = 6000;
-    DataBaseHelper myDbHelper;
-    final int ABOUT_ID = 114;
-    MyApplication myApp;
-    private Menu m_menu = null;
+    int m_currentId = 0;                                //Текущий id
+    ArrayList<DBItem> m_itemsList = new ArrayList<>();  //Список итемов (кнопкок детей)
+    DBItem m_currentItem = new DBItem();                //Текущий итем
+    boolean IS_MENU = true;                             //Меню (с кнопками) или статья
+    final int USER_ID = 6000;                           //Смещение для создания id кнопок
+    final int OFFSET_PICTURE = 13176;                   //Смещение для создания id кнопок
+    final int ABOUT_ID = 114;                           //id статьи "О приложении"
+    MyApplication myApp;                                //Глобальная переменная
+    private Menu m_menu = null;                         //Указатель на меню (ActionBar)
+    final int ANIMATE_TIME = 200;                     //Время анимации
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pattern_menu);
 
+        // Инициализация глобальной переменной
         myApp = (MyApplication)this.getApplication();
-        myDbHelper = myApp.db();
-
-        Bundle bundle = getIntent().getExtras();
-        m_currentId = bundle.getInt("parentId", -1);
-
-        setContentView(R.layout.activity_pattern_menu);
-
-        View someView = findViewById(R.id.imageView);
-        View root = someView.getRootView();
-        root.setBackgroundColor(getColor(R.color.colorBackground));
-
+        // Вызов загрузчика диалога "Оцените приложение"
         AppRater.app_launched(this, myApp.stackSize());
 
         generateAds();
-        getValues();
-        fillWindow();
+        createAll(0);
         amazingScroll();
     }
 
@@ -105,62 +83,46 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void createAll(int id, ImageView imageView)
     {
         m_currentId = id;
-        ((ScrollView)findViewById(R.id.scrollView)).scrollTo(0,0);
+        findViewById(R.id.scrollView).scrollTo(0,0);
         getValues();
         fillWindow();
 
-        //add empty view to scroll
+        //Добавление пустого элемента в LinearLayout для задания высоты блока (Костыль)
         ImageView imageView1 = ((ImageView)findViewById(R.id.imageView));
         int ivHeight = imageView1.getHeight();
         LinearLayout ll = findViewById(R.id.buttonsLayout);
         View tmp = new View(this);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT, ivHeight);
-        //lp.addRule(RelativeLayout.BELOW, m_lastElementId);
         tmp.setLayoutParams(lp);
         ll.addView(tmp);
 
-        //visible header buttons
-        m_menu.findItem(R.id.home_button).setVisible(m_currentId != 0);
+        //Установка видимости кнопки "Дом"
+        if(m_menu != null)
+            m_menu.findItem(R.id.home_button).setVisible(m_currentId != 0);
 
         //анимация появления элементов
-        ArrayList<ObjectAnimator> animators = new ArrayList<>();
         for (int i = 0; i < ll.getChildCount(); i++) {
             View v = ll.getChildAt(i);
             ObjectAnimator anim = ObjectAnimator.ofFloat(v,"alpha", 0.0f ,1.0f);
-            anim.setDuration(200);
+            anim.setDuration(ANIMATE_TIME);
             anim.start();
         }
     }
 
     protected void amazingScroll()
     {
-        /* intially hide the view */
-        //final TextView heading = findViewById(R.id.headerText);
-        //heading.setText(m_currentItem.name);
         final ScrollView scrollView = findViewById(R.id.scrollView);
         final ImageView parallaxImage =  findViewById(R.id.imageView);
 
-        // LinearLayout layout = (LinearLayout) findViewById(R.id.buttonsLayout);
-        //ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) layout.getLayoutParams();
-        //params.topMargin = parallaxImage.getHeight();
-
-
-        //heading.setAlpha(0f);
-        /* set the scroll change listener on scrollview */
         scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
-                /* get the maximum height which we have scroll before performing any action */
                 int maxDistance = parallaxImage.getHeight();
-                /* how much we have scrolled */
                 int movement = scrollView.getScrollY();
-                /*finally calculate the alpha factor and set on the view */
                 float alphaFactor = ((movement * 1.0f) / (maxDistance));
                 if (movement >= 0 && movement <= maxDistance) {
-                    /*for image parallax with scroll */
                     parallaxImage.setTranslationY(-movement/2);
-                    /* set visibility */
                     //parallaxImage.setAlpha(1.0f-alphaFactor);
                 }
             }
@@ -168,9 +130,7 @@ public class PatternMenuActivity extends AppCompatActivity {
     }
 
     public void addListenerOnPicture() {
-
-        ImageView image = (ImageView) findViewById(R.id.imageView);
-
+        ImageView image = findViewById(R.id.imageView);
         image.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -184,20 +144,9 @@ public class PatternMenuActivity extends AppCompatActivity {
     protected void onPictureClicked()
     {
         final MyApplication myApp = (MyApplication)this.getApplication();
-        if(m_currentId == 0)
-        {
-            deleteAll();
-            createAll(ABOUT_ID);
-            myApp.pushStack(m_currentId);
-        }
-
-        if(m_currentId == ABOUT_ID)
-        {
-            deleteAll();
-            createAll(0);
-            myApp.pushStack(m_currentId);
-        }
-
+        myApp.pushStack(m_currentId);
+        deleteAll();
+        createAll(m_currentId == 0 ? ABOUT_ID : 0);
     }
 
     protected void generateAds()
@@ -223,21 +172,6 @@ public class PatternMenuActivity extends AppCompatActivity {
         });
     }
 
-    public Rect locateView(View view) {
-        Rect loc = new Rect();
-        int[] location = new int[2];
-        if (view == null) {
-            return loc;
-        }
-        view.getLocationInWindow(location);
-
-        loc.left = location[0];
-        loc.top = location[1];
-        loc.right = loc.left + view.getWidth();
-        loc.bottom = loc.top + view.getHeight();
-        return loc;
-    }
-
     protected void animate(ImageView imView)
     {
         //анимация картинки из кнопки наверх
@@ -245,18 +179,18 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(imView, "scaleX", ((float) imageView.getWidth())/((float) imView.getWidth()));
         ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(imView, "scaleY", ((float) imageView.getHeight())/((float) imView.getHeight()));
-        scaleDownX.setDuration(200);
-        scaleDownY.setDuration(200);
+        scaleDownX.setDuration(ANIMATE_TIME);
+        scaleDownY.setDuration(ANIMATE_TIME);
 
         //Костыль, нодо подогнать ровную высоту
         Rect rectf = new Rect();
         int buttonId = imView.getId();
         findViewById(buttonId).getGlobalVisibleRect(rectf);
-        buttonId-= 13176;
+        buttonId-= OFFSET_PICTURE;
         ObjectAnimator animatorY = ObjectAnimator.ofFloat(imView, View.Y, -rectf.top + imageView.getHeight() - ((float)findViewById(buttonId).getHeight())/2f);
-        animatorY.setDuration(200);
+        animatorY.setDuration(ANIMATE_TIME);
         ObjectAnimator animatorX = ObjectAnimator.ofFloat(imView, View.X, imageView.getX() + (float)imageView.getWidth()  / 2 - (float)imView.getWidth()/2);//findViewById(m_lastElementId).getWidth() / 2);
-        animatorX.setDuration(200);
+        animatorX.setDuration(ANIMATE_TIME/2);
 
         AnimatorSet scaleDown = new AnimatorSet();
         scaleDown.play(scaleDownX).with(scaleDownY).with(animatorY).with(animatorX);
@@ -275,14 +209,21 @@ public class PatternMenuActivity extends AppCompatActivity {
                     if(vv.getId() != imView.getId())
                     {
                         ObjectAnimator anim = ObjectAnimator.ofFloat(vv,"alpha",0.0f);
-                        anim.setDuration(200);
+                        anim.setDuration(ANIMATE_TIME);
                         anim.start();
                     }
                 }
             }
+            else
+            {
+                ObjectAnimator anim = ObjectAnimator.ofFloat(v,"alpha",0.0f);
+                anim.setDuration(ANIMATE_TIME);
+                anim.start();
+            }
+
         }
-        scaleDownX.setDuration(200);
-        scaleDownY.setDuration(200);
+        scaleDownX.setDuration(ANIMATE_TIME);
+        scaleDownY.setDuration(ANIMATE_TIME);
     }
 
     protected void generateButton(DBItem item)
@@ -295,24 +236,16 @@ public class PatternMenuActivity extends AppCompatActivity {
         else
             b.setText(Html.fromHtml("<b><big>" + item.name + "</big></b>" ));
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(10,10,10,10);
-
-        b.setLayoutParams(params);
         b.setId(USER_ID + item.id);
         final Activity tmp = this;
         final MyApplication myApp = (MyApplication)this.getApplication();
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                int imageId = v.getId();
-                imageId+=13176;
-                final ImageView imView = tmp.findViewById(imageId);
                 myApp.pushStack(m_currentId);
-
+                int imageId = v.getId();
+                imageId+=OFFSET_PICTURE;
+                final ImageView imView = tmp.findViewById(imageId);
                 animate((ImageView) findViewById(imageId));
 
                 final int bId = v.getId();
@@ -322,35 +255,25 @@ public class PatternMenuActivity extends AppCompatActivity {
                         deleteAll();
                         createAll(bId - USER_ID, imView);
                     }
-                }, 200);
-
-
+                }, ANIMATE_TIME);
             }
         });
 
         GradientDrawable shape =  new GradientDrawable();
         shape.setCornerRadius(30);
-
         shape.setColor(getColor(R.color.colorButton));
-
         shape.setAlpha(255);
-        b.setPadding(20,20,20,20);
         b.setBackground(shape);
         b.setTextColor(Color.BLACK);
         b.setAllCaps(false);
-
-
 
         LinearLayout.LayoutParams lp_tv = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-
-        lp_tv.setMargins(10,10,10,10);
-
+        lp_tv.setMargins(5,5,5,5);
         b.setLayoutParams(lp_tv);
         b.setPadding(15 + 320,15,15,15);
-
         b.setMinHeight(200);
 
         ImageView imageView = new ImageView(this);
@@ -359,11 +282,11 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         imageView.setAdjustViewBounds(true);
         int imageId = b.getId();
-        imageId+=13176;
+        imageId+=OFFSET_PICTURE;
         imageView.setId(imageId);
 
         RelativeLayout.LayoutParams lp_im = new RelativeLayout.LayoutParams(320,180);
-        lp_im.setMargins(15,10,0,0);
+        lp_im.setMargins(15,0,0,0);
         lp_im.addRule(RelativeLayout.ALIGN_LEFT, b.getId());
         lp_im.addRule(RelativeLayout.CENTER_VERTICAL, b.getId());
         imageView.setLayoutParams(lp_im);
@@ -373,6 +296,7 @@ public class PatternMenuActivity extends AppCompatActivity {
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT
         );
+        rl.setPadding(5, 5, 5, 5);
         rl.setClipChildren(false);
         rl.setClipToPadding(false);
         rl.setLayoutParams(lp_rl);
@@ -422,6 +346,8 @@ public class PatternMenuActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean focus) {
         super.onWindowFocusChanged(focus);
+
+        createAll(0);
         ImageView imageView = ((ImageView)findViewById(R.id.imageView));
         int ivHeight = imageView.getHeight();
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
@@ -430,6 +356,7 @@ public class PatternMenuActivity extends AppCompatActivity {
 
         LinearLayout ll = findViewById(R.id.buttonsLayout);
         ll.setLayoutParams(layoutParams);
+
     }
 
     protected void setBackGroundAndTitle() {
@@ -559,9 +486,6 @@ public class PatternMenuActivity extends AppCompatActivity {
                 item =  myApp.getRandomItem();
 
             used.add(item.id);
-            int ffsf = 111;
-            if(item.image == null)
-                ffsf = 99;
             generateButton(item);
         }
     }

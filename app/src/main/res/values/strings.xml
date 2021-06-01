@@ -2,4 +2,20 @@
     <string name="app_name">Бани и сауны: руководство</string>
     <string name="home_button">На главную страницу</string>
     <string name="goToStore">Вам нравится? \n Пожалуйста, поставьте оценку на Google Play, это поможет улучшить приложение.</string>
+    <string name="title_activity_application_runtime">ApplicationRuntime</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Начальная страница</string>
+    <string name="menu_gallery">Избранное</string>
+    <string name="menu_slideshow">История</string>
+    <string name="menu_tools">Настройки</string>
+    <string name="menu_share">Написать нам</string>
+    <string name="menu_send">О программе</string>
+    <string name="app_mail">bathhouseapp@gmail.com</string>
+
 </resources>

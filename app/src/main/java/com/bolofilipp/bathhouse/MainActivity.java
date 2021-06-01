@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this);
         bundle = options.toBundle();
 
-        Intent intent = new Intent(this, PatternMenuActivity.class);
+        Intent intent = new Intent(this, ApplicationRuntime.class);
         intent.putExtra("parentId", 0);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -3,26 +3,32 @@
     package="com.bolofilipp.bathhouse">
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="false"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="com.bolofilipp.bathhouse.MyApplication">
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".ApplicationRuntime"
+            android:label="@string/title_activity_application_runtime"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3564080458767960~3600198422"/>
+            android:value="ca-app-pub-3564080458767960~3600198422" />
 
-        <activity android:name="com.bolofilipp.bathhouse.PatternMenuActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name="com.bolofilipp.bathhouse.MainActivity"
+        <activity
+            android:name=".PatternMenuActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
